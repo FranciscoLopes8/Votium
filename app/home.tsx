@@ -3,9 +3,9 @@ import { View, Text, Image, TextInput, TouchableOpacity, FlatList, StyleSheet } 
 import { useRouter } from "expo-router";
 
 const candidatos = [
-  { id: "1", nome: "Mauro Pires", partido: "Frelimo", imagem: require("../assets/images/icon.png") },
-  { id: "2", nome: "Mauro Pires", partido: "Renamo", imagem: require("../assets/images/favicon.png") },
-  { id: "3", nome: "Mauro Pires", partido: "MDM", imagem: require("../assets/images/react-logo.png") },
+  { id: "1", nome: "Mauro Pires", partido: "Frelimo", imagem: require("../assets/images/candidate1.png") },
+  { id: "2", nome: "Mauro Pires", partido: "Renamo", imagem: require("../assets/images/candidate2.png") },
+  { id: "3", nome: "Mauro Pires", partido: "MDM", imagem: require("../assets/images/candidate3.png") },
 ];
 
 export default function Home() {
@@ -16,7 +16,7 @@ export default function Home() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Image source={require("../assets/images/LOGO_COR_SEM_FUNDO.png")} style={styles.profilePic} />
+        <Image source={require("../assets/images/profile.png")} style={styles.profilePic} />
         <View>
           <Text style={styles.userName}>Igor Freitas</Text>
           <Text style={styles.userRole}>Voter</Text>
@@ -25,7 +25,7 @@ export default function Home() {
 
       {/* Contagem Regressiva */}
       <View style={styles.countdownContainer}>
-        <Text style={styles.countdownTitle}>⏳ Remaining time for the election</Text>
+        <Text style={styles.countdownTitle}>Remaining time for the election</Text>
         <View style={styles.countdown}>
           <View style={styles.countdownBox}><Text style={styles.countdownText}>124</Text><Text style={styles.countdownLabel}>Days</Text></View>
           <View style={styles.countdownBox}><Text style={styles.countdownText}>4</Text><Text style={styles.countdownLabel}>Hours</Text></View>
@@ -48,7 +48,9 @@ export default function Home() {
             <View style={styles.candidateInfo}>
               <Text style={styles.candidateName}>{item.nome}</Text>
               <Text style={styles.candidateParty}>{item.partido}</Text>
-              <TouchableOpacity style={styles.profileButton} onPress={() => router.push(`/create`)}>
+              <TouchableOpacity
+                style={styles.profileButton}
+                onPress={() => router.push(`/candidateDetails/${item.id}`)}>
                 <Text style={styles.profileButtonText}>View profile</Text>
               </TouchableOpacity>
             </View>
@@ -56,26 +58,26 @@ export default function Home() {
         )}
       />
 
-      {/* Barra de Navegação */}
+      {/* Navbar */}
       <View style={styles.navBar}>
-        <TouchableOpacity onPress={() => { setSelectedTab("home"); router.push("/home"); }} style={styles.navItem}>
-          <Image source={require("../assets/images/home.png")} style={[styles.navIcon, selectedTab === "home" && styles.activeIcon]} />
-          <Text style={[styles.navText, selectedTab === "home" && styles.activeText]}>Início</Text>
+        <TouchableOpacity onPress={() => setSelectedTab("home")} style={styles.navItem}>
+          <Image source={require("../assets/icons/home.png")} style={selectedTab === "home" ? styles.navIconActive : styles.navIcon} />
+          <Text style={selectedTab === "home" ? styles.navTextActive : styles.navText}>Início</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => { setSelectedTab("vote"); router.push("/vote"); }} style={styles.navItem}>
-          <Image source={require("../assets/images/vervoto.png")} style={[styles.navIcon, selectedTab === "vote" && styles.activeIcon]} />
-          <Text style={[styles.navText, selectedTab === "vote" && styles.activeText]}>Ver Voto</Text>
+        <TouchableOpacity onPress={() => router.push("/voto")} style={styles.navItem}>
+          <Image source={require("../assets/icons/vervoto.png")} style={styles.navIcon} />
+          <Text style={styles.navText}>Ver Voto</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => { setSelectedTab("profile"); router.push("/profile"); }} style={styles.navItem}>
-          <Image source={require("../assets/images/perfil.png")} style={[styles.navIcon, selectedTab === "profile" && styles.activeIcon]} />
-          <Text style={[styles.navText, selectedTab === "profile" && styles.activeText]}>Perfil</Text>
+        <TouchableOpacity onPress={() => router.push("/perfil")} style={styles.navItem}>
+          <Image source={require("../assets/icons/perfil.png")} style={styles.navIcon} />
+          <Text style={styles.navText}>Perfil</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 }
+
+// Estilos (ajustado para ficar mais próximo da imagem)
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", padding: 20 },
@@ -99,13 +101,13 @@ const styles = StyleSheet.create({
   profileButton: { borderWidth: 1, borderColor: "#6C63FF", padding: 5, borderRadius: 5, alignItems: "center", width: 100 },
   profileButtonText: { color: "#6C63FF", fontSize: 12, fontWeight: "bold" },
 
-  // 🟣 Estilos da Navbar
-  navBar: { flexDirection: "row", justifyContent: "space-around", paddingVertical: 15, backgroundColor: "#fff", borderRadius: 20, elevation: 3 },
+  // Navbar Estilizada
+  navBar: { flexDirection: "row", justifyContent: "space-around", paddingVertical: 15, borderTopWidth: 1, borderColor: "#ddd", backgroundColor: "#fff" },
   navItem: { alignItems: "center" },
-  navIcon: { width: 30, height: 30, tintColor: "#777" },
-  navText: { fontSize: 14, color: "#777" },
-
-  // Ativo (roxo)
-  activeIcon: { tintColor: "#6C63FF" },
-  activeText: { color: "#6C63FF", fontWeight: "bold" },
+  navIcon: { width: 24, height: 24, tintColor: "#777" },
+  navIconActive: { width: 24, height: 24, tintColor: "#6C63FF" },
+  navText: { fontSize: 12, color: "#777" },
+  navTextActive: { fontSize: 12, color: "#6C63FF", fontWeight: "bold" },
 });
+
+export default Home;
