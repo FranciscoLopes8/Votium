@@ -1,9 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 
+
 export default function Index() {
+  const [telefone, setTelefone] = useState("");
+  const [password, setPassword] = useState("");
   const router = useRouter();
+
+  const handleLogin = async () => {
+    if (!telefone || !password) {
+      alert("Preencha todos os campos!");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://192.168.1.169:5000/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ telefone, password }),
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        router.push("/home");
+      } else {
+        alert(data.message || "Credenciais Erradas");
+      }
+    } catch (error) {
+      console.error("Erro no login:", error);
+      alert("Erro ao fazer login, tente novamente mais tarde.");
+    }
+  };
+
 
   return (
     <View style={styles.container}>
@@ -16,10 +46,19 @@ export default function Index() {
       </Text>
 
       {/* Campo Código Pessoal */}
-      <TextInput style={styles.input} placeholder="Código Pessoal" placeholderTextColor="#aaa" />
+      <TextInput style={styles.input}
+        placeholder="Número de Telefone"
+        placeholderTextColor="#aaa"
+        value={telefone}
+        onChangeText={setTelefone} />
 
       {/* Campo Palavra-Passe */}
-      <TextInput style={styles.input} placeholder="Palavra-passe" placeholderTextColor="#aaa" secureTextEntry />
+      <TextInput style={styles.input}
+        placeholder="Palavra-passe"
+        placeholderTextColor="#aaa"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword} />
 
       {/* Link Esqueceu a senha */}
       <TouchableOpacity>
@@ -27,7 +66,7 @@ export default function Index() {
       </TouchableOpacity>
 
       {/* Botão Entrar */}
-      <TouchableOpacity style={styles.loginButton} onPress={() => router.push("/home")}>
+      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
         <Text style={styles.loginText}>Entrar</Text>
       </TouchableOpacity>
 
@@ -48,8 +87,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   logo: {
-    width: 100, // Ajuste conforme necessário
-    height: 100, // Ajuste conforme necessário
+    width: 100,
+    height: 100,
     resizeMode: "contain",
     marginBottom: 20,
   },

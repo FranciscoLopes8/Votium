@@ -26,6 +26,7 @@ export default function CriarConta() {
       });
 
       const data = await response.json();
+      
       if (response.ok) {
         router.push("/verification");
       } else {
