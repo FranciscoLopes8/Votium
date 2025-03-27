@@ -6,8 +6,6 @@ const router = express.Router();
 
 router.post("/login", async (req, res) => {
     const { telefone, password } = req.body;
-    console.log(telefone);
-    console.log(password);
 
     try {
         const user = await User.findOne({ telefone });
