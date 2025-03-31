@@ -3,9 +3,9 @@ import { View, Text, Image, TextInput, TouchableOpacity, FlatList, StyleSheet } 
 import { useRouter } from "expo-router";
 
 const candidatos = [
-  { id: "1", nome: "Mauro Pires", partido: "Frelimo", imagem: require("../assets/images/candidate1.png") },
-  { id: "2", nome: "Mauro Pires", partido: "Renamo", imagem: require("../assets/images/candidate2.png") },
-  { id: "3", nome: "Mauro Pires", partido: "MDM", imagem: require("../assets/images/candidate3.png") },
+  { id: "1", nome: "Mauro Pires", partido: "Frelimo", imagem: require("../assets/images/icon.png") },
+  { id: "2", nome: "Mauro Pires", partido: "Renamo", imagem: require("../assets/images/favicon.png") },
+  { id: "3", nome: "Mauro Pires", partido: "MDM", imagem: require("../assets/images/react-logo.png") },
 ];
 
 export default function Home() {
@@ -16,7 +16,7 @@ export default function Home() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Image source={require("../assets/images/profile.png")} style={styles.profilePic} />
+        <Image source={require("../assets/images/logo.png")} style={styles.profilePic} />
         <View>
           <Text style={styles.userName}>Igor Freitas</Text>
           <Text style={styles.userRole}>Voter</Text>
@@ -25,7 +25,7 @@ export default function Home() {
 
       {/* Contagem Regressiva */}
       <View style={styles.countdownContainer}>
-        <Text style={styles.countdownTitle}>Remaining time for the election</Text>
+        <Text style={styles.countdownTitle}>⏳ Remaining time for the election</Text>
         <View style={styles.countdown}>
           <View style={styles.countdownBox}><Text style={styles.countdownText}>124</Text><Text style={styles.countdownLabel}>Days</Text></View>
           <View style={styles.countdownBox}><Text style={styles.countdownText}>4</Text><Text style={styles.countdownLabel}>Hours</Text></View>
@@ -48,41 +48,21 @@ export default function Home() {
             <View style={styles.candidateInfo}>
               <Text style={styles.candidateName}>{item.nome}</Text>
               <Text style={styles.candidateParty}>{item.partido}</Text>
-              <TouchableOpacity
-                style={styles.profileButton}
-                onPress={() => router.push(`/candidateDetails/${item.id}`)}>
+              <TouchableOpacity style={styles.profileButton} onPress={() => router.push(`/detalhes`)}>
                 <Text style={styles.profileButtonText}>View profile</Text>
               </TouchableOpacity>
             </View>
           </View>
         )}
       />
-
-      {/* Navbar */}
-      <View style={styles.navBar}>
-        <TouchableOpacity onPress={() => setSelectedTab("home")} style={styles.navItem}>
-          <Image source={require("../assets/icons/home.png")} style={selectedTab === "home" ? styles.navIconActive : styles.navIcon} />
-          <Text style={selectedTab === "home" ? styles.navTextActive : styles.navText}>Início</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/voto")} style={styles.navItem}>
-          <Image source={require("../assets/icons/vervoto.png")} style={styles.navIcon} />
-          <Text style={styles.navText}>Ver Voto</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/perfil")} style={styles.navItem}>
-          <Image source={require("../assets/icons/perfil.png")} style={styles.navIcon} />
-          <Text style={styles.navText}>Perfil</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
 
-// Estilos (ajustado para ficar mais próximo da imagem)
-
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", padding: 20 },
-  header: { flexDirection: "row", alignItems: "center", marginBottom: 20 },
-  profilePic: { width: 50, height: 50, borderRadius: 25, marginRight: 10 },
+  header: { flexDirection: "row", alignItems: "center", marginBottom: 30 },
+  profilePic: { width: 60, height: 60, borderRadius: 25, marginRight: 10},
   userName: { fontSize: 18, fontWeight: "bold" },
   userRole: { color: "#777" },
   countdownContainer: { backgroundColor: "#6C63FF", borderRadius: 10, padding: 15, marginBottom: 20 },
@@ -101,13 +81,4 @@ const styles = StyleSheet.create({
   profileButton: { borderWidth: 1, borderColor: "#6C63FF", padding: 5, borderRadius: 5, alignItems: "center", width: 100 },
   profileButtonText: { color: "#6C63FF", fontSize: 12, fontWeight: "bold" },
 
-  // Navbar Estilizada
-  navBar: { flexDirection: "row", justifyContent: "space-around", paddingVertical: 15, borderTopWidth: 1, borderColor: "#ddd", backgroundColor: "#fff" },
-  navItem: { alignItems: "center" },
-  navIcon: { width: 24, height: 24, tintColor: "#777" },
-  navIconActive: { width: 24, height: 24, tintColor: "#6C63FF" },
-  navText: { fontSize: 12, color: "#777" },
-  navTextActive: { fontSize: 12, color: "#6C63FF", fontWeight: "bold" },
 });
-
-export default Home;

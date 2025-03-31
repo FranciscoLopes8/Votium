@@ -16,7 +16,7 @@ export default function CandidateDetails() {
     nivelAcademico: "Mestrado em Relações Internacionais",
     biografia:
       "Trabalhou como organizador comunitário em Chicago, advogado de direitos civis e professor de direito constitucional na Universidade de Chicago.",
-    imagem: require("../assets/images/candidate1.png"),
+    imagem: require("../assets/images/logo.png"),
   };
 
   return (
@@ -52,7 +52,7 @@ export default function CandidateDetails() {
       </View>
 
       {/* Modal de Confirmação */}
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+      <Modal animationType="none" transparent={true} visible={modalVisible}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Confirmation</Text>
