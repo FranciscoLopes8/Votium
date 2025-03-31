@@ -15,14 +15,14 @@ export default function Index() {
     }
 
     try {
-      const response = await fetch("http://192.168.1.169:5000/auth/login", {
+      const response = await fetch("http://7eba-2001-8a0-fe23-9f00-35dd-a722-7c4a-7d09.ngrok-free.app/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ telefone, password }),
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
         router.push("/home");
       } else {

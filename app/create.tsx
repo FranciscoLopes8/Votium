@@ -19,14 +19,14 @@ export default function CriarConta() {
     }
 
     try {
-      const response = await fetch("http://192.168.1.169:5000/auth/register", {
+      const response = await fetch("http://7eba-2001-8a0-fe23-9f00-35dd-a722-7c4a-7d09.ngrok-free.app/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ primeiroNome, ultimoNome, telefone, senha, role }),
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
         router.push("/verification");
       } else {
