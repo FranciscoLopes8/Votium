@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import { Picker } from "@react-native-picker/picker";
 
 export default function Settings() {
   const router = useRouter();
 
-  // Estados para os botões selecionados
+  // Estados para os botões e idioma selecionado
   const [notificacoes, setNotificacoes] = useState("Sim");
-  const [idioma, setIdioma] = useState("Português");
   const [tema, setTema] = useState("Claro");
+  const [idioma, setIdioma] = useState("Português");
 
   return (
     <View style={styles.container}>
@@ -42,13 +43,18 @@ export default function Settings() {
       {/* Idioma */}
       <View style={styles.optionContainer}>
         <Text style={styles.optionLabel}>Idioma</Text>
-        <View style={styles.toggleContainer}>
-          <TouchableOpacity
-            style={[styles.toggleButton, idioma === "Português" && styles.activeButton]}
-            onPress={() => setIdioma("Português")}
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={idioma}
+            onValueChange={(itemValue) => setIdioma(itemValue)}
+            style={styles.picker}
           >
-            <Text style={[styles.toggleText, idioma === "Português" && styles.activeText]}>Português</Text>
-          </TouchableOpacity>
+            <Picker.Item label="Português" value="Português" />
+            <Picker.Item label="Inglês" value="Inglês" />
+            <Picker.Item label="Espanhol" value="Espanhol" />
+            <Picker.Item label="Francês" value="Francês" />
+            <Picker.Item label="Mandarim" value="Mandarim" />
+          </Picker>
         </View>
       </View>
 
@@ -140,6 +146,15 @@ const styles = StyleSheet.create({
   activeText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  pickerContainer: {
+    backgroundColor: "#F5F5F5",
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  picker: {
+    height: 50,
+    width: "100%",
   },
   saveButton: {
     backgroundColor: "#4B2AFA",
