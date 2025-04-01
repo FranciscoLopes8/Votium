@@ -16,13 +16,13 @@ export default function Profile() {
       </TouchableOpacity>
 
       <View style={styles.optionsContainer}>
-        <TouchableOpacity style={styles.option}>
+        <TouchableOpacity style={styles.option} onPress={() => router.push("/settings")}>
           <Text style={styles.optionText}>⚙️ Configurações</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.option}>
+        <TouchableOpacity style={styles.option} onPress={() => router.push("/about")}>
           <Text style={styles.optionText}>📞 Suporte</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.logout}>
+        <TouchableOpacity style={styles.logout} onPress={() => alert("Logout Efetuado!")}>
           <Text style={styles.logoutText}>🚪 Sair</Text>
         </TouchableOpacity>
       </View>
