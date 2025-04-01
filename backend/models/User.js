@@ -6,6 +6,7 @@ const UserSchema = new mongoose.Schema({
     telefone: { type: String, required: true, unique: true },
     senha: { type: String, required: true },
     role: { type: String, enum: ["Admin", "User"], default: "User" },
+    codigoPessoal: { type: String, required: true, unique: true },
 });
 
 module.exports = mongoose.model("User", UserSchema);
