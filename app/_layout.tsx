@@ -1,6 +1,6 @@
 import { Stack, useRouter } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView, Platform } from "react-native";
 import { useState } from "react";
 import './globals.css';
 
@@ -10,55 +10,66 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      {/* Renderiza as páginas */}
-      <Stack screenOptions={{ headerShown: false, gestureEnabled: false, animation: "none" }} />
+      {/* SafeAreaView para evitar sobreposição com a barra de status */}
+      <SafeAreaView style={styles.safeArea}>
 
-      {/* 🔽 Navbar Global 🔽 */}
-      <View style={styles.navBar}>
-        <TouchableOpacity 
-          onPress={() => { setSelectedTab("home"); router.push("/home"); }} 
-          style={styles.navItem}
-        >
-          <Image 
-            source={require("../assets/images/icon.png")} 
-            style={[styles.navIcon, selectedTab === "home" && styles.activeIcon]} 
-          />
-          <Text style={[styles.navText, selectedTab === "home" && styles.activeText]}>Início</Text>
-        </TouchableOpacity>
+        {/* Renderiza as páginas */}
+        <Stack screenOptions={{ headerShown: false, gestureEnabled: false, animation: "none" }} />
 
-        <TouchableOpacity 
-          onPress={() => { setSelectedTab("vote"); router.push("/voto"); }} 
-          style={styles.navItem}
-        >
-          <Image 
-            source={require("../assets/images/icon.png")} 
-            style={[styles.navIcon, selectedTab === "vote" && styles.activeIcon]} 
-          />
-          <Text style={[styles.navText, selectedTab === "vote" && styles.activeText]}>Ver Voto</Text>
-        </TouchableOpacity>
+        {/* 🔽 Navbar Global 🔽 */}
+        <View style={styles.navBar}>
+          <TouchableOpacity 
+            onPress={() => { setSelectedTab("home"); router.push("/home"); }} 
+            style={styles.navItem}
+          >
+            <Image 
+              source={require("../assets/images/icon.png")} 
+              style={[styles.navIcon, selectedTab === "home" && styles.activeIcon]} 
+            />
+            <Text style={[styles.navText, selectedTab === "home" && styles.activeText]}>Início</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity 
-          onPress={() => { setSelectedTab("profile"); router.push("/perfil"); }} 
-          style={styles.navItem}
-        >
-          <Image 
-            source={require("../assets/images/icon.png")} 
-            style={[styles.navIcon, selectedTab === "profile" && styles.activeIcon]} 
-          />
-          <Text style={[styles.navText, selectedTab === "profile" && styles.activeText]}>Perfil</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity 
+            onPress={() => { setSelectedTab("vote"); router.push("/voto"); }} 
+            style={styles.navItem}
+          >
+            <Image 
+              source={require("../assets/images/icon.png")} 
+              style={[styles.navIcon, selectedTab === "vote" && styles.activeIcon]} 
+            />
+            <Text style={[styles.navText, selectedTab === "vote" && styles.activeText]}>Ver Voto</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            onPress={() => { setSelectedTab("profile"); router.push("/perfil"); }} 
+            style={styles.navItem}
+          >
+            <Image 
+              source={require("../assets/images/icon.png")} 
+              style={[styles.navIcon, selectedTab === "profile" && styles.activeIcon]} 
+            />
+            <Text style={[styles.navText, selectedTab === "profile" && styles.activeText]}>Perfil</Text>
+          </TouchableOpacity>
+        </View>
+
+      </SafeAreaView>
     </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingTop: Platform.OS === "android" ? 25 : 0, // Ajusta para Android
+  },
   navBar: {
     flexDirection: "row",
     justifyContent: "space-around",
     paddingVertical: 15,
     backgroundColor: "#fff",
-    borderRadius: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     elevation: 3,
     position: "absolute",
     bottom: 0,
