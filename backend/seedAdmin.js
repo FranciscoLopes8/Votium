@@ -15,6 +15,7 @@ const seedAdmin = async () => {
             telefone: "000000000",
             senha: hashedPassword,
             role: "Admin",
+            codigoPessoal: "00000000"
         });
 
         await adminUser.save();

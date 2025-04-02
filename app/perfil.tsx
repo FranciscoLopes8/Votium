@@ -1,20 +1,66 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Profile() {
   const router = useRouter();
+  const [showCode, setShowCode] = useState(false);
+  const [user, setUser] = useState({ primeiroNome: "", ultimoNome: "", role: "", codigoPessoal: "" });
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        if (!token) {
+          router.push("./authLogin");
+          return;
+        }
+
+        const response = await fetch("http://192.168.1.170:5000/auth/perfil", {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setUser(data);  // Atualiza o estado com as informações do usuário
+        } else {
+          alert("Erro ao carregar perfil");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar perfil:", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   return (
     <View style={styles.container}>
+      {/* Perfil */}
       <Image source={require("../assets/images/icon.png")} style={styles.profilePic} />
-      <Text style={styles.name}>Igor Freitas</Text>
-      <Text style={styles.role}>Voter</Text>
-
+      <Text style={styles.name}>{user.primeiroNome} {user.ultimoNome}</Text>
+      <Text style={styles.role}>{user.role}</Text>
       <TouchableOpacity style={styles.editButton} onPress={() => router.push("/editar")}>
         <Text style={styles.editText}>Editar</Text>
       </TouchableOpacity>
 
+      {/* Código Pessoal */}
+      <View style={styles.codeWrapper}>
+        <View style={styles.codeContainer}>
+          <Text style={styles.codeText}>{showCode ? user.codigoPessoal : "Código Pessoal"}</Text>
+          <TouchableOpacity onPress={() => setShowCode(!showCode)}>
+            <Ionicons name={showCode ? "eye-off" : "eye"} size={24} color="gray" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Opções */}
       <View style={styles.optionsContainer}>
         <TouchableOpacity style={styles.option} onPress={() => router.push("/settings")}>
           <Text style={styles.optionText}>⚙️ Configurações</Text>
@@ -22,7 +68,10 @@ export default function Profile() {
         <TouchableOpacity style={styles.option} onPress={() => router.push("/about")}>
           <Text style={styles.optionText}>📞 Suporte</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.logout} onPress={() => alert("Logout Efetuado!")}>
+        <TouchableOpacity style={styles.logout} onPress={async () => {
+          await AsyncStorage.removeItem("token");
+          router.push("./authLogin");
+        }}>
           <Text style={styles.logoutText}>🚪 Sair</Text>
         </TouchableOpacity>
       </View>
@@ -35,8 +84,11 @@ const styles = StyleSheet.create({
   profilePic: { width: 100, height: 100, borderRadius: 50 },
   name: { fontSize: 22, fontWeight: "bold", marginTop: 10 },
   role: { fontSize: 16, color: "#777" },
-  editButton: { backgroundColor: "#6C63FF", padding: 10, borderRadius: 5, marginTop: 20 },
+  editButton: { backgroundColor: "#6C63FF", padding: 10, borderRadius: 5, marginTop: 10 },
   editText: { color: "#fff", fontWeight: "bold" },
+  codeWrapper: { backgroundColor: "#fff", padding: 20, borderRadius: 10, shadowColor: "#000", shadowOpacity: 0.1, shadowOffset: { width: 0, height: 2 }, shadowRadius: 4, elevation: 3, marginTop: 30 },
+  codeContainer: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "70%" },
+  codeText: { fontSize: 20, fontWeight: "bold", color: "black", marginRight: 10 },
   optionsContainer: { marginTop: 30, width: "80%" },
   option: { paddingVertical: 15, borderBottomWidth: 1, borderColor: "#ddd" },
   optionText: { fontSize: 16 },

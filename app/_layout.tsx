@@ -1,4 +1,4 @@
-import { Stack, useRouter } from "expo-router";
+import { Stack, useRouter, usePathname } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView, Platform } from "react-native";
 import { useState } from "react";
@@ -6,52 +6,64 @@ import './globals.css';
 
 export default function RootLayout() {
   const router = useRouter();
+  const pathname = usePathname();  // Usando usePathname para obter o caminho atual
+
   const [selectedTab, setSelectedTab] = useState("home");
+
+  // Se estiver nas páginas index ou create, não exibe a navbar
+  if (pathname === "/login" || pathname === "/create" || pathname === "/") {
+    return (
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaView style={styles.safeArea}>
+          {/* Renderiza as páginas */}
+          <Stack screenOptions={{ headerShown: false, gestureEnabled: false, animation: "none" }} />
+        </SafeAreaView>
+      </GestureHandlerRootView>
+    );
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       {/* SafeAreaView para evitar sobreposição com a barra de status */}
       <SafeAreaView style={styles.safeArea}>
-
         {/* Renderiza as páginas */}
         <Stack screenOptions={{ headerShown: false, gestureEnabled: false, animation: "none" }} />
 
-        {/* 🔽 Navbar Global 🔽 */}
+        {/* Navbar Global */}
         <View style={styles.navBar}>
-          <TouchableOpacity 
-            onPress={() => { setSelectedTab("home"); router.push("/home"); }} 
+          <TouchableOpacity
+            onPress={() => { setSelectedTab("home"); router.push("/home"); }}
             style={styles.navItem}
           >
-            <Image 
-              source={require("../assets/images/icon.png")} 
-              style={[styles.navIcon, selectedTab === "home" && styles.activeIcon]} 
+            <Image
+              source={require("../assets/images/home.png")}
+              style={[styles.navIcon, selectedTab === "home" && styles.activeIcon]}
             />
             <Text style={[styles.navText, selectedTab === "home" && styles.activeText]}>Início</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            onPress={() => { setSelectedTab("vote"); router.push("/voto"); }} 
+          <TouchableOpacity
+            onPress={() => { setSelectedTab("vote"); router.push("/voto"); }}
             style={styles.navItem}
           >
-            <Image 
-              source={require("../assets/images/icon.png")} 
-              style={[styles.navIcon, selectedTab === "vote" && styles.activeIcon]} 
+            <Image
+              source={require("../assets/images/home.png")}
+              style={[styles.navIcon, selectedTab === "vote" && styles.activeIcon]}
             />
             <Text style={[styles.navText, selectedTab === "vote" && styles.activeText]}>Ver Voto</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            onPress={() => { setSelectedTab("profile"); router.push("/perfil"); }} 
+          <TouchableOpacity
+            onPress={() => { setSelectedTab("profile"); router.push("/perfil"); }}
             style={styles.navItem}
           >
-            <Image 
-              source={require("../assets/images/icon.png")} 
-              style={[styles.navIcon, selectedTab === "profile" && styles.activeIcon]} 
+            <Image
+              source={require("../assets/images/home.png")}
+              style={[styles.navIcon, selectedTab === "profile" && styles.activeIcon]}
             />
             <Text style={[styles.navText, selectedTab === "profile" && styles.activeText]}>Perfil</Text>
           </TouchableOpacity>
         </View>
-
       </SafeAreaView>
     </GestureHandlerRootView>
   );
@@ -66,13 +78,18 @@ const styles = StyleSheet.create({
   navBar: {
     flexDirection: "row",
     justifyContent: "space-around",
+    alignItems: "center",
     paddingVertical: 15,
     backgroundColor: "#fff",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    elevation: 3,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: -2 },
+    shadowRadius: 4,
+    elevation: 5,
     position: "absolute",
-    bottom: 0,
+    bottom: 30, // Movido para cima
     width: "100%",
   },
   navItem: { alignItems: "center" },

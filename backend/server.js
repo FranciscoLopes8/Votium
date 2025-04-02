@@ -18,8 +18,9 @@ mongoose
     .catch((err) => console.log(err));
 
 // Rotas
-app.use("/auth", require("./routes/authRoutes.js"));
+app.use("/auth", require("./routes/authRegister.js"));
 app.use("/auth", require("./routes/authLogin.js"));
+app.use("/auth", require("./routes/authPerfil.js"));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));

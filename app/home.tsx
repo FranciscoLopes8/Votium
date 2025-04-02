@@ -16,11 +16,11 @@ export default function Home() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Image source={require("../assets/images/logo.png")} style={styles.profilePic} />
+        <Image source={require("../assets/images/home.png")} style={styles.profilePic} />
         <View>
           <Text style={styles.userName}>Igor Freitas</Text>
           <Text style={styles.userRole}>Voter</Text>
-        </View>
+        </View> 
       </View>
 
       {/* Contagem Regressiva */}
@@ -62,7 +62,7 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", padding: 20 },
   header: { flexDirection: "row", alignItems: "center", marginBottom: 30 },
-  profilePic: { width: 60, height: 60, borderRadius: 25, marginRight: 10},
+  profilePic: { width: 60, height: 60, borderRadius: 25, marginRight: 10 },
   userName: { fontSize: 18, fontWeight: "bold" },
   userRole: { color: "#777" },
   countdownContainer: { backgroundColor: "#6C63FF", borderRadius: 10, padding: 15, marginBottom: 20 },

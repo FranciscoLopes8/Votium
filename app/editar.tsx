@@ -13,7 +13,7 @@ export default function RootLayout() {
       {/* Renderiza as páginas */}
       <Stack screenOptions={{ headerShown: false, gestureEnabled: false, animation: "none" }} />
 
-      {/* 🔽 Navbar Global 🔽 */}
+      {/*  Navbar Global  */}
       <View style={styles.navBar}>
         <TouchableOpacity 
           onPress={() => { setSelectedTab("home"); router.push("/home"); }} 

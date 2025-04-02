@@ -16,7 +16,7 @@ export default function CandidateDetails() {
     nivelAcademico: "Mestrado em Relações Internacionais",
     biografia:
       "Trabalhou como organizador comunitário em Chicago, advogado de direitos civis e professor de direito constitucional na Universidade de Chicago.",
-    imagem: require("../assets/images/logo.png"),
+    imagem: require("../assets/images/home.png"),
   };
 
   return (
