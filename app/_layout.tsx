@@ -1,21 +1,20 @@
 import { Stack, useRouter, usePathname } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView, Platform } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Platform } from "react-native";
 import { useState } from "react";
-import './globals.css';
+import { Ionicons } from "@expo/vector-icons";
+import "./globals.css";
 
 export default function RootLayout() {
   const router = useRouter();
-  const pathname = usePathname();  // Usando usePathname para obter o caminho atual
+  const pathname = usePathname();
 
   const [selectedTab, setSelectedTab] = useState("home");
 
-  // Se estiver nas páginas index ou create, não exibe a navbar
   if (pathname === "/login" || pathname === "/create" || pathname === "/") {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaView style={styles.safeArea}>
-          {/* Renderiza as páginas */}
           <Stack screenOptions={{ headerShown: false, gestureEnabled: false, animation: "none" }} />
         </SafeAreaView>
       </GestureHandlerRootView>
@@ -24,21 +23,15 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      {/* SafeAreaView para evitar sobreposição com a barra de status */}
       <SafeAreaView style={styles.safeArea}>
-        {/* Renderiza as páginas */}
         <Stack screenOptions={{ headerShown: false, gestureEnabled: false, animation: "none" }} />
 
-        {/* Navbar Global */}
         <View style={styles.navBar}>
           <TouchableOpacity
             onPress={() => { setSelectedTab("home"); router.push("/home"); }}
             style={styles.navItem}
           >
-            <Image
-              source={require("../assets/images/home.png")}
-              style={[styles.navIcon, selectedTab === "home" && styles.activeIcon]}
-            />
+            <Ionicons name="home" size={30} color={selectedTab === "home" ? "#6C63FF" : "#777"} />
             <Text style={[styles.navText, selectedTab === "home" && styles.activeText]}>Início</Text>
           </TouchableOpacity>
 
@@ -46,10 +39,7 @@ export default function RootLayout() {
             onPress={() => { setSelectedTab("vote"); router.push("/voto"); }}
             style={styles.navItem}
           >
-            <Image
-              source={require("../assets/images/home.png")}
-              style={[styles.navIcon, selectedTab === "vote" && styles.activeIcon]}
-            />
+            <Ionicons name="stats-chart" size={30} color={selectedTab === "vote" ? "#6C63FF" : "#777"} />
             <Text style={[styles.navText, selectedTab === "vote" && styles.activeText]}>Ver Voto</Text>
           </TouchableOpacity>
 
@@ -57,10 +47,7 @@ export default function RootLayout() {
             onPress={() => { setSelectedTab("profile"); router.push("/perfil"); }}
             style={styles.navItem}
           >
-            <Image
-              source={require("../assets/images/home.png")}
-              style={[styles.navIcon, selectedTab === "profile" && styles.activeIcon]}
-            />
+            <Ionicons name="person" size={30} color={selectedTab === "profile" ? "#6C63FF" : "#777"} />
             <Text style={[styles.navText, selectedTab === "profile" && styles.activeText]}>Perfil</Text>
           </TouchableOpacity>
         </View>
@@ -73,7 +60,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingTop: Platform.OS === "android" ? 25 : 0, // Ajusta para Android
+    paddingTop: Platform.OS === "android" ? 25 : 0,
   },
   navBar: {
     flexDirection: "row",
@@ -89,12 +76,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
     position: "absolute",
-    bottom: 30, // Movido para cima
+    bottom: 30,
     width: "100%",
   },
   navItem: { alignItems: "center" },
-  navIcon: { width: 30, height: 30, tintColor: "#777" },
   navText: { fontSize: 14, color: "#777" },
-  activeIcon: { tintColor: "#6C63FF" },
   activeText: { color: "#6C63FF", fontWeight: "bold" },
 });
