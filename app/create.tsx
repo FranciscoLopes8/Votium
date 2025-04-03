@@ -30,11 +30,11 @@ export default function CriarConta() {
       const data = await response.json();
 
       if (response.ok) {
-        // Se a criação da conta for bem-sucedida, salva o token no AsyncStorage
-        await AsyncStorage.setItem("token", data.token);  // Supondo que a resposta contenha um "token"
-        router.push("/verification");  // Redireciona para a tela de verificação
+        
+        await AsyncStorage.setItem("token", data.token); 
+        router.push("/verification");  
       } else {
-        alert(data.message);  // Exibe mensagem de erro, se houver
+        alert(data.message);  
       }
     } catch (error) {
       alert("Erro ao conectar ao servidor.");

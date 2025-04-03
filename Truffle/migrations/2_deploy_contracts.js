@@ -1,7 +1,5 @@
-const teste = artifacts.require("teste");
-const votoTeste = artifacts.require("votoTeste");
+const voto = artifacts.require("Votacao");
 
 module.exports = function (deployer) {
-  deployer.deploy(teste);
-  deployer.deploy(votoTeste);
+  deployer.deploy(voto);
 };

@@ -15,7 +15,7 @@ interface Candidato {
 
 export default function CandidateDetails() {
   const navigation = useNavigation();
-  const { id } = useLocalSearchParams(); // Pegando o ID do candidato da query string
+  const { id } = useLocalSearchParams(); 
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
   const [candidato, setCandidato] = useState<Candidato | null>(null);
@@ -166,8 +166,8 @@ const styles = StyleSheet.create({
   modalText: { fontSize: 14, textAlign: "center", fontWeight: "bold" },
   modalSubtext: { fontSize: 12, textAlign: "center", color: "#777", marginVertical: 10 },
   modalButtons: { flexDirection: "row", marginTop: 15 },
-  cancelButton: { padding: 10, borderRadius: 5, marginRight: 10, borderWidth: 1, borderColor: "#6C63FF" },
-  cancelText: { color: "#6C63FF", fontWeight: "bold" },
-  confirmButton: { backgroundColor: "#6C63FF", padding: 10, borderRadius: 5 },
+  cancelButton: { padding: 10, borderRadius: 5, marginRight: 10, borderWidth: 1, borderColor: "#4B2AFA" },
+  cancelText: { color: "#4B2AFA", fontWeight: "bold" },
+  confirmButton: { backgroundColor: "#4B2AFA", padding: 10, borderRadius: 5 },
   confirmText: { color: "#fff", fontWeight: "bold" },
 });
