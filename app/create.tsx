@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { router } from "expo-router";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function CriarConta() {
   const navigation = useNavigation();
@@ -11,13 +12,14 @@ export default function CriarConta() {
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const role = "User";
+  const [user, setUser] = useState({ primeiroNome: "", ultimoNome: "", role: "", codigoPessoal: "" });
 
   const handleCriarConta = async () => {
     if (senha !== confirmarSenha) {
       alert("As senhas não coincidem!");
       return;
     }
-    //7eba-2001-8a0-fe23-9f00-35dd-a722-7c4a-7d09.ngrok-free.app
+
     try {
       const response = await fetch("http://192.168.1.170:5000/auth/register", {
         method: "POST",
@@ -28,14 +30,47 @@ export default function CriarConta() {
       const data = await response.json();
 
       if (response.ok) {
-        router.push("/verification");
+        // Se a criação da conta for bem-sucedida, salva o token no AsyncStorage
+        await AsyncStorage.setItem("token", data.token);  // Supondo que a resposta contenha um "token"
+        router.push("/verification");  // Redireciona para a tela de verificação
       } else {
-        alert(data.message);
+        alert(data.message);  // Exibe mensagem de erro, se houver
       }
     } catch (error) {
       alert("Erro ao conectar ao servidor.");
     }
   };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        if (!token) {
+          router.push("./authLogin");
+          return;
+        }
+
+        const response = await fetch("http://192.168.1.170:5000/auth/perfil", {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setUser(data);
+        } else {
+          alert("Erro ao carregar perfil");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar perfil:", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   return (
     <View style={styles.container}>

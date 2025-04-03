@@ -1,27 +1,82 @@
-import React, { useState } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet, Modal } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, ActivityIndicator } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
+
+interface Candidato {
+  _id: string;
+  nome: string;
+  partido: string;
+  nascimento: string;
+  naturalidade: string;
+  biografia: string;
+  imagem: string; // URL
+}
 
 export default function CandidateDetails() {
-  const { id } = useLocalSearchParams(); // Pegando o ID do candidato
+  const navigation = useNavigation();
+  const { id } = useLocalSearchParams(); // Pegando o ID do candidato da query string
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
+  const [candidato, setCandidato] = useState<Candidato | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Simulação de dados do candidato (poderia ser buscado da API)
-  const candidato = {
-    nome: "Mauro Pires",
-    partido: "Frelimo",
-    nascimento: "12/02/1976",
-    naturalidade: "Maputo",
-    nivelAcademico: "Mestrado em Relações Internacionais",
-    biografia:
-      "Trabalhou como organizador comunitário em Chicago, advogado de direitos civis e professor de direito constitucional na Universidade de Chicago.",
-    imagem: require("../assets/images/home.png"),
-  };
+  useEffect(() => {
+    const fetchCandidate = async () => {
+      if (!id) {
+        alert("ID do candidato não fornecido");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch("http://192.168.1.170:5000/candidates");
+
+        const contentType = response.headers.get("content-type");
+        if (!response.ok || !contentType || !contentType.includes("application/json")) {
+          throw new Error("Resposta inválida da API");
+        }
+
+        const data: Candidato[] = await response.json();
+
+        const candidatoEncontrado = data.find((c) => c._id === id);
+
+        if (candidatoEncontrado) {
+          setCandidato(candidatoEncontrado);
+        } else {
+          alert("Candidato não encontrado");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar candidato:", error);
+        alert("Erro ao buscar candidato. Verifique sua conexão ou tente novamente mais tarde.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCandidate();
+  }, [id]);
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#6C63FF" style={styles.loading} />;
+  }
+
+  if (!candidato) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>Candidato não encontrado</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <Image source={candidato.imagem} style={styles.image} />
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Text style={styles.backText}>{"<"}</Text>
+      </TouchableOpacity>
+
+      {/* Imagem do Candidato */}
+      <Image source={{ uri: candidato.imagem }} style={styles.image} />
       <Text style={styles.name}>{candidato.nome}</Text>
       <Text style={styles.party}>{candidato.partido}</Text>
 
@@ -36,18 +91,15 @@ export default function CandidateDetails() {
         <Text style={styles.inactiveTab}>Campaign</Text>
       </View>
 
-      {/* Informações do Candidato */}
+      {/* Informações do candidato */}
       <View style={styles.infoContainer}>
-        <Text style={styles.label}>Birthday</Text>
+        <Text style={styles.label}>Nascimento:</Text>
         <Text style={styles.text}>{candidato.nascimento}</Text>
 
-        <Text style={styles.label}>Naturalness</Text>
+        <Text style={styles.label}>Naturalidade:</Text>
         <Text style={styles.text}>{candidato.naturalidade}</Text>
 
-        <Text style={styles.label}>Academic Level</Text>
-        <Text style={styles.text}>{candidato.nivelAcademico}</Text>
-
-        <Text style={styles.label}>Biography</Text>
+        <Text style={styles.label}>Biografia:</Text>
         <Text style={styles.text}>{candidato.biografia}</Text>
       </View>
 
@@ -75,14 +127,33 @@ export default function CandidateDetails() {
 }
 
 const styles = StyleSheet.create({
+  backButton: {
+    position: "absolute",
+    top: 40,
+    left: 20,
+    backgroundColor: "#4B2AFA",
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
+  },
+  backText: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
   container: { flex: 1, backgroundColor: "#fff", padding: 20 },
+  loading: { flex: 1, justifyContent: "center", alignItems: "center" },
+  errorText: { fontSize: 18, textAlign: "center", marginTop: 50, color: "red" },
   image: { width: "100%", height: 200, borderRadius: 10 },
   name: { fontSize: 22, fontWeight: "bold", marginTop: 10 },
   party: { fontSize: 16, color: "#777", marginBottom: 20 },
-  voteButton: { backgroundColor: "#6C63FF", padding: 15, borderRadius: 10, alignItems: "center", marginBottom: 20 },
+  voteButton: { backgroundColor: "#4B2AFA", padding: 15, borderRadius: 10, alignItems: "center", marginBottom: 20 },
   voteText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
   tabs: { flexDirection: "row", marginBottom: 10 },
-  activeTab: { fontWeight: "bold", color: "#6C63FF", marginRight: 20, borderBottomWidth: 2, borderBottomColor: "#6C63FF" },
+  activeTab: { fontWeight: "bold", color: "#4B2AFA", marginRight: 20, borderBottomWidth: 2, borderBottomColor: "#6C63FF" },
   inactiveTab: { color: "#777" },
   infoContainer: { marginTop: 10 },
   label: { fontSize: 14, fontWeight: "bold", marginTop: 10 },

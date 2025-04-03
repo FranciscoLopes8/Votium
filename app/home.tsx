@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   profilePic: { width: 50, height: 50, borderRadius: 25 },
   name: { fontSize: 22, fontWeight: "bold", marginLeft: 10 },
   sectionTitle: { fontSize: 18, fontWeight: "bold", marginVertical: 20, textAlign: "center" },
-  countdownContainer: { backgroundColor: "#6C63FF", borderRadius: 10, padding: 15, marginBottom: 20, marginHorizontal: 20 },
+  countdownContainer: { backgroundColor: "#4B2AFA", borderRadius: 10, padding: 15, marginBottom: 20, marginHorizontal: 20 },
   countdownTitle: { color: "#fff", fontSize: 14, textAlign: "center", marginBottom: 10 },
   countdown: { flexDirection: "row", justifyContent: "space-around" },
   countdownBox: { alignItems: "center" },
@@ -148,32 +148,7 @@ const styles = StyleSheet.create({
   candidateInfo: { flex: 1, justifyContent: "center" },
   candidateName: { fontSize: 16, fontWeight: "bold" },
   candidateParty: { color: "#777", marginBottom: 5 },
-  profileButton: { backgroundColor: "#6C63FF", padding: 10, borderRadius: 5, marginTop: 10, width: 100 },
+  profileButton: { backgroundColor: "#4B2AFA", padding: 10, borderRadius: 5, marginTop: 10, width: 100 },
   profileButtonText: { color: "#fff", fontSize: 12, fontWeight: "bold", alignSelf: "center" },
   loading: { flex: 1, justifyContent: "center", alignItems: "center" }
 });
-
-{/*
-const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: "center", backgroundColor: "#fff", paddingTop: 50 },
-  profileHeader: { flexDirection: "row", alignItems: "center", width: "100%", paddingHorizontal: 20, marginBottom: 20 },
-  profilePic: { width: 50, height: 50, borderRadius: 25 },
-  name: { fontSize: 22, fontWeight: "bold", marginLeft: 10 },
-  sectionTitle: { fontSize: 18, fontWeight: "bold", marginTop: 20 },
-  countdownContainer: { backgroundColor: "#6C63FF", borderRadius: 10, padding: 15, marginBottom: 20 },
-  countdownTitle: { color: "#fff", fontSize: 14, textAlign: "center", marginBottom: 10 },
-  countdown: { flexDirection: "row", justifyContent: "space-around" },
-  
-  ,
-  
-  
-  candidateImage: { width: 60, height: 60, borderRadius: 30, marginRight: 10 },
-  candidateInfo: { flex: 1, justifyContent: "center" },
-  candidateName: { fontSize: 16, fontWeight: "bold" },
-  candidateParty: { color: "#777", marginBottom: 5 },
-  profileButton: { borderWidth: 1, borderColor: "#6C63FF", padding: 5, borderRadius: 5, alignItems: "center", width: 100 },
-  profileButtonText: { color: "#6C63FF", fontSize: 12, fontWeight: "bold" },
-  loading: { flex: 1, justifyContent: "center", alignItems: "center" },
-  noCandidatos: { color: "#777", fontSize: 16, marginTop: 20 },
-});
-*/}

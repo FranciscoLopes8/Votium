@@ -31,7 +31,7 @@ export default function RootLayout() {
             onPress={() => { setSelectedTab("home"); router.push("/home"); }}
             style={styles.navItem}
           >
-            <Ionicons name="home" size={30} color={selectedTab === "home" ? "#6C63FF" : "#777"} />
+            <Ionicons name="home" size={30} color={selectedTab === "home" ? "#4B2AFA" : "#777"} />
             <Text style={[styles.navText, selectedTab === "home" && styles.activeText]}>Início</Text>
           </TouchableOpacity>
 
@@ -39,7 +39,7 @@ export default function RootLayout() {
             onPress={() => { setSelectedTab("vote"); router.push("/voto"); }}
             style={styles.navItem}
           >
-            <Ionicons name="stats-chart" size={30} color={selectedTab === "vote" ? "#6C63FF" : "#777"} />
+            <Ionicons name="stats-chart" size={30} color={selectedTab === "vote" ? "#4B2AFA" : "#777"} />
             <Text style={[styles.navText, selectedTab === "vote" && styles.activeText]}>Ver Voto</Text>
           </TouchableOpacity>
 
@@ -47,7 +47,7 @@ export default function RootLayout() {
             onPress={() => { setSelectedTab("profile"); router.push("/perfil"); }}
             style={styles.navItem}
           >
-            <Ionicons name="person" size={30} color={selectedTab === "profile" ? "#6C63FF" : "#777"} />
+            <Ionicons name="person" size={30} color={selectedTab === "profile" ? "#4B2AFA" : "#777"} />
             <Text style={[styles.navText, selectedTab === "profile" && styles.activeText]}>Perfil</Text>
           </TouchableOpacity>
         </View>
@@ -81,5 +81,5 @@ const styles = StyleSheet.create({
   },
   navItem: { alignItems: "center" },
   navText: { fontSize: 14, color: "#777" },
-  activeText: { color: "#6C63FF", fontWeight: "bold" },
+  activeText: { color: "#4B2AFA", fontWeight: "bold" },
 });

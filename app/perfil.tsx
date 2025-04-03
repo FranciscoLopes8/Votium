@@ -28,7 +28,7 @@ export default function Profile() {
         const data = await response.json();
 
         if (response.ok) {
-          setUser(data);  // Atualiza o estado com as informações do usuário
+          setUser(data);  
         } else {
           alert("Erro ao carregar perfil");
         }
@@ -63,16 +63,19 @@ export default function Profile() {
       {/* Opções */}
       <View style={styles.optionsContainer}>
         <TouchableOpacity style={styles.option} onPress={() => router.push("/settings")}>
-          <Text style={styles.optionText}>⚙️ Configurações</Text>
+          <Ionicons name="settings" size={24} color="gray" />
+          <Text style={styles.optionText}>Configurações</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.option} onPress={() => router.push("/about")}>
-          <Text style={styles.optionText}>📞 Suporte</Text>
+          <Ionicons name="call" size={24} color="gray" />
+          <Text style={styles.optionText}>Suporte</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.logout} onPress={async () => {
           await AsyncStorage.removeItem("token");
           router.push("./authLogin");
         }}>
-          <Text style={styles.logoutText}>🚪 Sair</Text>
+          <Ionicons name="log-out" size={24} color="red" />
+          <Text style={styles.logoutText}>Sair</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -84,14 +87,14 @@ const styles = StyleSheet.create({
   profilePic: { width: 100, height: 100, borderRadius: 50 },
   name: { fontSize: 22, fontWeight: "bold", marginTop: 10 },
   role: { fontSize: 16, color: "#777" },
-  editButton: { backgroundColor: "#6C63FF", padding: 10, borderRadius: 5, marginTop: 10 },
+  editButton: { backgroundColor: "#4B2AFA", padding: 10, borderRadius: 5, marginTop: 10 },
   editText: { color: "#fff", fontWeight: "bold" },
   codeWrapper: { backgroundColor: "#fff", padding: 20, borderRadius: 10, shadowColor: "#000", shadowOpacity: 0.1, shadowOffset: { width: 0, height: 2 }, shadowRadius: 4, elevation: 3, marginTop: 30 },
   codeContainer: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "70%" },
   codeText: { fontSize: 20, fontWeight: "bold", color: "black", marginRight: 10 },
   optionsContainer: { marginTop: 30, width: "80%" },
-  option: { paddingVertical: 15, borderBottomWidth: 1, borderColor: "#ddd" },
-  optionText: { fontSize: 16 },
-  logout: { marginTop: 20 },
-  logoutText: { color: "red", fontSize: 16, fontWeight: "bold" },
+  option: { flexDirection: "row", alignItems: "center", paddingVertical: 15, borderBottomWidth: 1, borderColor: "#ddd" },
+  optionText: { fontSize: 16, marginLeft: 10 },
+  logout: { marginTop: 20, flexDirection: "row", alignItems: "center" },
+  logoutText: { color: "red", fontSize: 16, fontWeight: "bold", marginLeft: 10 },
 });
