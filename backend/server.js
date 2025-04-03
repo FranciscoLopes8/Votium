@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const seedAdmin = require("./seedAdmin");
+const seedCandidates = require('./seedCandidates');
 
 const app = express();
 app.use(cors());
@@ -13,7 +14,8 @@ mongoose
     .connect(process.env.MONGO_URI)
     .then(async () => {
         await seedAdmin();
-        console.log("MongoDB conectado");
+        await seedCandidates();
+        console.log("MongoDB Connected");
     })
     .catch((err) => console.log(err));
 
@@ -21,6 +23,7 @@ mongoose
 app.use("/auth", require("./routes/authRegister.js"));
 app.use("/auth", require("./routes/authLogin.js"));
 app.use("/auth", require("./routes/authPerfil.js"));
+app.use("/candidates", require("./routes/candidates.js"));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
