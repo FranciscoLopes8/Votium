@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Settings() {
-  const router = useRouter();
+  const navigation = useNavigation();
 
   // Estados para os botões e idioma selecionado
   const [notificacoes, setNotificacoes] = useState("Sim");
@@ -14,7 +14,7 @@ export default function Settings() {
   return (
     <View style={styles.container}>
       {/* Botão de voltar */}
-      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
         <Text style={styles.backText}>{"<"}</Text>
       </TouchableOpacity>
 
@@ -103,6 +103,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 10,
   },
   backText: {
     color: "#fff",
@@ -114,6 +115,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "left",
+    marginTop: 40,
   },
   optionContainer: {
     marginBottom: 20,

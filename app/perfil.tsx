@@ -18,7 +18,7 @@ export default function Profile() {
           return;
         }
 
-        const response = await fetch("http://192.168.1.170:5000/auth/perfil", {
+        const response = await fetch("http://192.168.115.116:5000/auth/perfil", {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -74,6 +74,8 @@ export default function Profile() {
           await AsyncStorage.removeItem("token");
           router.push("./authLogin");
         }}>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.option} onPress={() => router.push("/login")}>
           <Ionicons name="log-out" size={24} color="red" />
           <Text style={styles.logoutText}>Sair</Text>
         </TouchableOpacity>

@@ -26,7 +26,7 @@ export default function Home() {
           return;
         }
 
-        const response = await fetch("http://192.168.1.170:5000/auth/perfil", {
+        const response = await fetch("http://192.168.115.116:5000/auth/perfil", {
           method: "GET",
           headers: { "Authorization": `Bearer ${token}` },
         });
@@ -45,7 +45,7 @@ export default function Home() {
 
     const fetchCandidatos = async () => {
       try {
-        const response = await fetch("http://192.168.1.170:5000/candidates");
+        const response = await fetch("http://192.168.115.116:5000/candidates");
         const data: Candidato[] = await response.json();
 
         if (response.ok) {
@@ -76,7 +76,15 @@ export default function Home() {
           <Image source={require("../assets/images/icon.png")} style={styles.profilePic} />
         </TouchableOpacity>
         <Text style={styles.name}>{user.primeiroNome}</Text>
+
+        {/* Botão exclusivo para Admin */}
+        {user.role === "Admin" && (
+          <TouchableOpacity style={styles.adminButton} onPress={() => router.push("/perfil")}>
+            <Text style={styles.profileButtonText}>Campanha</Text>
+          </TouchableOpacity>
+        )}
       </View>
+
 
       {/* Contagem Regressiva */}
       <View style={styles.countdownContainer}>
@@ -150,5 +158,6 @@ const styles = StyleSheet.create({
   candidateParty: { color: "#777", marginBottom: 5 },
   profileButton: { backgroundColor: "#4B2AFA", padding: 10, borderRadius: 5, marginTop: 10, width: 100 },
   profileButtonText: { color: "#fff", fontSize: 12, fontWeight: "bold", alignSelf: "center" },
-  loading: { flex: 1, justifyContent: "center", alignItems: "center" }
+  loading: { flex: 1, justifyContent: "center", alignItems: "center" },
+  adminButton: { backgroundColor: "#4B2AFA", padding: 10, borderRadius: 5, marginTop: 10, width: 90, marginLeft: "auto" }
 });

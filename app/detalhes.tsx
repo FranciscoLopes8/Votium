@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, ActivityIndicator } from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useNavigation } from "@react-navigation/native";
 
 interface Candidato {
@@ -16,7 +16,6 @@ interface Candidato {
 export default function CandidateDetails() {
   const navigation = useNavigation();
   const { id } = useLocalSearchParams(); 
-  const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
   const [candidato, setCandidato] = useState<Candidato | null>(null);
   const [loading, setLoading] = useState(true);
@@ -30,7 +29,7 @@ export default function CandidateDetails() {
       }
 
       try {
-        const response = await fetch("http://192.168.1.170:5000/candidates");
+        const response = await fetch("http://192.168.115.116:5000/candidates");
 
         const contentType = response.headers.get("content-type");
         if (!response.ok || !contentType || !contentType.includes("application/json")) {
@@ -83,11 +82,11 @@ export default function CandidateDetails() {
       {/* Botão de Votação */}
       <TouchableOpacity style={styles.voteButton} onPress={() => setModalVisible(true)}>
         <Text style={styles.voteText}>Vote now</Text>
-      </TouchableOpacity>
+      </TouchableOpacity>       
 
       {/* Tabs de Informação */}
       <View style={styles.tabs}>
-        <Text style={styles.activeTab}>Profile</Text>
+        <Text style={styles.activeTab}>Profile</Text> 
         <Text style={styles.inactiveTab}>Campaign</Text>
       </View>
 

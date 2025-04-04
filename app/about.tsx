@@ -1,14 +1,14 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
 
 export default function About() {
-  const router = useRouter();
+  const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
       {/* Botão Voltar */}
-      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
         <Text style={styles.backText}>{"<"}</Text>
       </TouchableOpacity>
 
@@ -49,6 +49,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 10,
   },
   backText: {
     color: "#fff",
@@ -59,13 +60,9 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     marginBottom: 10,
+    marginTop:40,
   },
-  description: {
-    fontSize: 16,
-    color: "#333",
-    marginBottom: 20,
-    textAlign: "justify",
-  },
+  description: { fontSize: 16, color: "#000" },
   subTitle: {
     fontSize: 18,
     fontWeight: "bold",
@@ -74,7 +71,7 @@ const styles = StyleSheet.create({
   },
   contact: {
     fontSize: 16,
-    color: "#333",
+    color: "#000",
   },
   bold: {
     fontWeight: "bold",

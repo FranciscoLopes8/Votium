@@ -17,7 +17,7 @@ export default function Index() {
     }
 
     try {
-      const response = await fetch("http://192.168.1.170:5000/auth/login", {
+      const response = await fetch("http://192.168.115.116:5000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ telefone, password }),
@@ -44,7 +44,7 @@ export default function Index() {
         <Image source={require("../assets/images/LOGO_COR_SEM_FUNDO.png")} style={styles.logo} />
       </View>
 
-      <View style={styles.content}> 
+      <View style={styles.content}>
         {/* Título */}
         <Text style={styles.title}>Bem-Vindo ao Votium</Text>
 
