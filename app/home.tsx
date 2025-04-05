@@ -26,7 +26,7 @@ export default function Home() {
           return;
         }
 
-        const response = await fetch("http://192.168.115.116:5000/auth/perfil", {
+        const response = await fetch("http://192.168.1.80:5000/auth/perfil", {
           method: "GET",
           headers: { "Authorization": `Bearer ${token}` },
         });
@@ -45,7 +45,7 @@ export default function Home() {
 
     const fetchCandidatos = async () => {
       try {
-        const response = await fetch("http://192.168.115.116:5000/candidates");
+        const response = await fetch("http://192.168.1.80:5000/candidates");
         const data: Candidato[] = await response.json();
 
         if (response.ok) {
@@ -79,7 +79,7 @@ export default function Home() {
 
         {/* Botão exclusivo para Admin */}
         {user.role === "Admin" && (
-          <TouchableOpacity style={styles.adminButton} onPress={() => router.push("/perfil")}>
+          <TouchableOpacity style={styles.adminButton} onPress={() => router.push("/Campanha")}>
             <Text style={styles.profileButtonText}>Campanha</Text>
           </TouchableOpacity>
         )}
