@@ -68,16 +68,23 @@ export default function Campanha() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.push("/home")}>
         <Text style={styles.backText}>{"<"}</Text>
       </TouchableOpacity>
 
       <Text style={styles.title}>Campanha</Text>
 
-      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateBox}>
+      <View style={styles.dateBox}>
         <Text style={styles.dateLabel}>Data da Votação</Text>
-        <Text style={styles.dateValue}>{dataVotacao.toLocaleDateString("pt-PT")}</Text>
-      </TouchableOpacity>
+        <View style={styles.dateRow}>
+          <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+            <Text style={styles.dateValue}>{dataVotacao.toLocaleDateString("pt-PT")}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.saveButtonSmall} onPress={guardarData}>
+            <Text style={styles.saveText}>Guardar</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
 
       {showDatePicker && (
         <DateTimePicker
@@ -118,10 +125,6 @@ export default function Campanha() {
           )}
         />
       </View>
-
-      <TouchableOpacity style={styles.saveButton} onPress={guardarData}>
-        <Text style={styles.saveText}>Guardar</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -183,24 +186,40 @@ const styles = StyleSheet.create({
     height: 35,
     alignItems: "center",
     justifyContent: "center",
-    
+
   },
   addText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
-  saveButton: {
-    backgroundColor: "#4B2AFA",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  saveText: { color: "#fff", fontWeight: "bold" },
   deleteButton: {
     backgroundColor: "#FF0000",
     justifyContent: "center",
     alignItems: "center",
-    width: 80, // Ajuste no tamanho do botão de exclusão
+    width: 80, 
     height: 40,
     marginVertical: 10,
     borderRadius: 10,
   },
   deleteText: { color: "#fff", fontWeight: "bold" },
+  dateRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  saveButtonSmall: {
+    backgroundColor: "#4B2AFA",
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    marginLeft: 10,
+  },
+  saveText: { color: "#fff", fontWeight: "bold" },
+  swipeLeftLimit: {
+    backgroundColor: "#ccc",
+    justifyContent: "center",
+    paddingLeft: 15,
+    width: 60, // <- isto limita visualmente a largura do swipe
+  },
+  limitedSwipeText: {
+    color: "#333",
+    fontWeight: "bold",
+  }
 });

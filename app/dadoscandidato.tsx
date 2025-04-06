@@ -83,7 +83,7 @@ export default function DadosCandidato() {
     >
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         {/* Botão Voltar */}
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <TouchableOpacity onPress={() => router.push("/Campanha")} style={styles.backButton}>
           <Text style={styles.backText}>{"<"}</Text>
         </TouchableOpacity>
 
