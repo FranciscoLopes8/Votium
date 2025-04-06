@@ -97,6 +97,6 @@ const styles = StyleSheet.create({
   optionsContainer: { marginTop: 30, width: "80%" },
   option: { flexDirection: "row", alignItems: "center", paddingVertical: 15, borderBottomWidth: 1, borderColor: "#ddd" },
   optionText: { fontSize: 16, marginLeft: 10 },
-  logout: { marginTop: 20, flexDirection: "row", alignItems: "center" },
+  logout: { flexDirection: "row", alignItems: "center" },
   logoutText: { color: "red", fontSize: 16, fontWeight: "bold", marginLeft: 10 },
 });

@@ -33,8 +33,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#fff", paddingHorizontal: 20 },
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 10 },
   subtitle: { fontSize: 16, textAlign: "center", marginBottom: 20 },
-  phone: { color: "#6C63FF", fontWeight: "bold" },
+  phone: { color: "#4B2AFA", fontWeight: "bold" },
   input: { width: "80%", height: 50, borderWidth: 1, borderRadius: 10, textAlign: "center", fontSize: 20, marginBottom: 20 },
-  button: { width: "80%", backgroundColor: "#6C63FF", padding: 15, borderRadius: 10, alignItems: "center" },
+  button: { width: "80%", backgroundColor: "#4B2AFA", padding: 15, borderRadius: 10, alignItems: "center" },
   buttonText: { color: "#fff", fontWeight: "bold" },
 });

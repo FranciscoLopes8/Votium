@@ -8,19 +8,19 @@ import { router } from "expo-router";
 export default function DadosCandidato() {
   const navigation = useNavigation();
 
-  // Estados
+  
   const [nome, setNome] = useState("");
   const [partido, setPartido] = useState("");
-  const [nascimento, setNascimento] = useState("");  // Atualizado para 'nascimento'
+  const [nascimento, setNascimento] = useState("");  
   const [naturalidade, setNaturalidade] = useState("");
   const [biografia, setBiografia] = useState("");
   const [plano, setPlano] = useState("");
   const [foto, setFoto] = useState<string | null>(null);
 
-  // Função para escolher a imagem
+  
   const escolherFoto = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images, // Usando a opção correta
+      mediaTypes: ImagePicker.MediaTypeOptions.Images, 
       allowsEditing: true,
       quality: 1,
     });
@@ -30,9 +30,8 @@ export default function DadosCandidato() {
     }
   };
 
-  // Função para guardar o candidato
+  
   const guardarCandidato = async () => {
-    // Verificação se todos os campos foram preenchidos
     if (!nome || !partido || !nascimento || !naturalidade || !biografia || !plano || !foto) {
       alert("Por favor, preencha todos os campos.");
       return;
@@ -41,7 +40,7 @@ export default function DadosCandidato() {
     const formData = new FormData();
     formData.append("nome", nome);
     formData.append("partido", partido);
-    formData.append("nascimento", nascimento);  // Atualizado para 'nascimento'
+    formData.append("nascimento", nascimento);
     formData.append("naturalidade", naturalidade);
     formData.append("biografia", biografia);
     formData.append("plano", plano);
@@ -50,7 +49,7 @@ export default function DadosCandidato() {
       const fotoUri = foto;
       const uriParts = fotoUri.split(".");
       const fileType = uriParts[uriParts.length - 1];
-      formData.append("imagem", {  // Alterado para 'imagem' no lugar de 'foto'
+      formData.append("imagem", {
         uri: fotoUri,
         name: `foto.${fileType}`,
         type: `image/${fileType}`,

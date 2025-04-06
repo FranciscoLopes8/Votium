@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, Image } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -9,6 +9,7 @@ interface Candidato {
   _id: string;
   nome: string;
   partido: string;
+  imagem?: string;
 }
 
 export default function Campanha() {
@@ -111,6 +112,7 @@ export default function Campanha() {
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
             <Swipeable
+              renderLeftActions={() => null}
               renderRightActions={() => (
                 <TouchableOpacity style={styles.deleteButton} onPress={() => excluirCandidato(item._id)}>
                   <Text style={styles.deleteText}>Excluir</Text>
@@ -118,8 +120,19 @@ export default function Campanha() {
               )}
             >
               <TouchableOpacity style={styles.candidatoCard}>
-                <Text style={styles.candidatoNome}>{item.nome}</Text>
-                <Text style={styles.candidatoPartido}>{item.partido}</Text>
+                <Image
+                  source={
+                    item.imagem && item.imagem.startsWith("/")
+                      ? { uri: `http://192.168.1.183:5000${item.imagem}` }
+                      : require("../assets/images/icon.png")
+                  }
+                  style={styles.candidateImage}
+                  resizeMode="cover"
+                />
+                <View style={{ marginLeft: 10 }}>
+                  <Text style={styles.candidatoNome}>{item.nome}</Text>
+                  <Text style={styles.candidatoPartido}>{item.partido}</Text>
+                </View>
               </TouchableOpacity>
             </Swipeable>
           )}
@@ -171,6 +184,8 @@ const styles = StyleSheet.create({
   },
   label: { fontWeight: "bold", marginBottom: 10 },
   candidatoCard: {
+    flexDirection: "row",
+    alignItems: "center",
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
@@ -186,14 +201,13 @@ const styles = StyleSheet.create({
     height: 35,
     alignItems: "center",
     justifyContent: "center",
-
   },
   addText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
   deleteButton: {
     backgroundColor: "#FF0000",
     justifyContent: "center",
     alignItems: "center",
-    width: 80, 
+    width: 80,
     height: 40,
     marginVertical: 10,
     borderRadius: 10,
@@ -212,14 +226,10 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   saveText: { color: "#fff", fontWeight: "bold" },
-  swipeLeftLimit: {
-    backgroundColor: "#ccc",
-    justifyContent: "center",
-    paddingLeft: 15,
-    width: 60, // <- isto limita visualmente a largura do swipe
+  candidateImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#ddd",
   },
-  limitedSwipeText: {
-    color: "#333",
-    fontWeight: "bold",
-  }
 });
