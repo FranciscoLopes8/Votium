@@ -29,7 +29,7 @@ export default function CandidateDetails() {
       }
 
       try {
-        const response = await fetch("http://192.168.1.183:5000/candidates");
+        const response = await fetch("http://192.168.1.80:5000/candidates");
 
         const contentType = response.headers.get("content-type");
         if (!response.ok || !contentType || !contentType.includes("application/json")) {
@@ -76,7 +76,7 @@ export default function CandidateDetails() {
 
       {/* Imagem do Candidato */}
       <Image 
-        source={candidato.imagem ? { uri: `http://192.168.1.183:5000${candidato.imagem}` } : require("../assets/images/icon.png")}
+        source={candidato.imagem ? { uri: `http://192.168.1.80:5000${candidato.imagem}` } : require("../assets/images/icon.png")}
         style={styles.image} 
       />
       <Text style={styles.name}>{candidato.nome}</Text>

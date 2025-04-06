@@ -57,7 +57,7 @@ export default function DadosCandidato() {
     }
 
     try {
-      const response = await fetch("http://192.168.1.183:5000/candidates", {
+      const response = await fetch("http://192.168.1.80:5000/candidates", {
         method: "POST",
         body: formData,
       });

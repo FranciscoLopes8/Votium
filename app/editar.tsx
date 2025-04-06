@@ -1,72 +1,85 @@
-import { Stack, useRouter } from "expo-router";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import { useState } from "react";
-import './globals.css';
+// app/editar.tsx
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
 
-export default function RootLayout() {
+export default function EditarPerfil() {
   const router = useRouter();
-  const [selectedTab, setSelectedTab] = useState("home");
+  const [nome, setNome] = useState("");
+  const [sobrenome, setSobrenome] = useState("");
+  const [foto, setFoto] = useState<string | null>(null);
+
+  const selecionarFoto = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setFoto(result.assets[0].uri);
+    }
+  };
+
+  const salvar = () => {
+    // Aqui podes adicionar lógica para salvar no backend
+    console.log("Nome:", nome, "Sobrenome:", sobrenome, "Foto:", foto);
+    router.push("/perfil");
+  };
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      {/* Renderiza as páginas */}
-      <Stack screenOptions={{ headerShown: false, gestureEnabled: false, animation: "none" }} />
+    <View style={styles.container}>
+      <TouchableOpacity onPress={selecionarFoto}>
+        <Image
+          source={foto ? { uri: foto } : require("../assets/images/icon.png")}
+          style={styles.foto}
+        />
+        <Text style={styles.trocarFoto}>Alterar Foto</Text>
+      </TouchableOpacity>
 
-      {/*  Navbar Global  */}
-      <View style={styles.navBar}>
-        <TouchableOpacity 
-          onPress={() => { setSelectedTab("home"); router.push("/home"); }} 
-          style={styles.navItem}
-        >
-          <Image 
-            source={require("../assets/images/icon.png")} 
-            style={[styles.navIcon, selectedTab === "home" && styles.activeIcon]} 
-          />
-          <Text style={[styles.navText, selectedTab === "home" && styles.activeText]}>Início</Text>
-        </TouchableOpacity>
+      <TextInput
+        style={styles.input}
+        placeholder="Primeiro Nome"
+        value={nome}
+        onChangeText={setNome}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Último Nome"
+        value={sobrenome}
+        onChangeText={setSobrenome}
+      />
 
-        <TouchableOpacity 
-          onPress={() => { setSelectedTab("vote"); router.push("/voto"); }} 
-          style={styles.navItem}
-        >
-          <Image 
-            source={require("../assets/images/icon.png")} 
-            style={[styles.navIcon, selectedTab === "vote" && styles.activeIcon]} 
-          />
-          <Text style={[styles.navText, selectedTab === "vote" && styles.activeText]}>Ver Voto</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          onPress={() => { setSelectedTab("profile"); router.push("/perfil"); }} 
-          style={styles.navItem}
-        >
-          <Image 
-            source={require("../assets/images/icon.png")} 
-            style={[styles.navIcon, selectedTab === "profile" && styles.activeIcon]} 
-          />
-          <Text style={[styles.navText, selectedTab === "profile" && styles.activeText]}>Perfil</Text>
-        </TouchableOpacity>
-      </View>
-    </GestureHandlerRootView>
+      <TouchableOpacity style={styles.botao} onPress={salvar}>
+        <Text style={styles.botaoTexto}>Salvar</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  navBar: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingVertical: 15,
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    elevation: 3,
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
+  container: { flex: 1, paddingTop: 60, alignItems: "center", backgroundColor: "#fff" },
+  foto: { width: 100, height: 100, borderRadius: 50, marginBottom: 10 },
+  trocarFoto: { color: "#6C63FF", marginBottom: 20 },
+  input: {
+    width: "80%",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 15,
   },
-  navItem: { alignItems: "center" },
-  navIcon: { width: 30, height: 30, tintColor: "#777" },
-  navText: { fontSize: 14, color: "#777" },
-  activeIcon: { tintColor: "#6C63FF" },
-  activeText: { color: "#6C63FF", fontWeight: "bold" },
+  botao: {
+    backgroundColor: "#4B2AFA",
+    padding: 12,
+    borderRadius: 8,
+    width: "80%",
+    alignItems: "center",
+  },
+  botaoTexto: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
 });

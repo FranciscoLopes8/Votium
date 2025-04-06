@@ -21,7 +21,7 @@ export default function Campanha() {
   useEffect(() => {
     const fetchCandidatos = async () => {
       try {
-        const response = await fetch("http://192.168.1.183:5000/candidates");
+        const response = await fetch("http://192.168.1.80:5000/candidates");
         const data: Candidato[] = await response.json();
         setCandidatos(data);
       } catch (error) {
@@ -39,7 +39,7 @@ export default function Campanha() {
         text: "Excluir",
         onPress: async () => {
           try {
-            const response = await fetch(`http://192.168.1.183:5000/candidates/${id}`, {
+            const response = await fetch(`http://192.168.1.80:5000/candidates/${id}`, {
               method: "DELETE",
             });
 
