@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator, Dimensions } from "react-native";
+import { View, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FlashList } from "@shopify/flash-list";
+import { Ionicons } from '@expo/vector-icons';
 
 interface Candidato {
   _id: string;
   nome: string;
   partido: string;
-  imagem: string;
+  imagem?: string | null;
 }
 
 export default function Home() {
@@ -16,6 +17,7 @@ export default function Home() {
   const [user, setUser] = useState({ primeiroNome: "", ultimoNome: "", role: "", codigoPessoal: "" });
   const [candidatos, setCandidatos] = useState<Candidato[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tempoRestante, setTempoRestante] = useState({ dias: 0, horas: 0, minutos: 0, segundos: 0 });
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -26,7 +28,7 @@ export default function Home() {
           return;
         }
 
-        const response = await fetch("http://192.168.1.80:5000/auth/perfil", {
+        const response = await fetch("http://192.168.1.183:5000/auth/perfil", {
           method: "GET",
           headers: { "Authorization": `Bearer ${token}` },
         });
@@ -45,14 +47,9 @@ export default function Home() {
 
     const fetchCandidatos = async () => {
       try {
-        const response = await fetch("http://192.168.1.80:5000/candidates");
+        const response = await fetch("http://192.168.1.183:5000/candidates");
         const data: Candidato[] = await response.json();
-
-        if (response.ok) {
-          setCandidatos(data);
-        } else {
-          alert("Erro ao carregar candidatos");
-        }
+        setCandidatos(data);
       } catch (error) {
         console.error("Erro ao buscar candidatos:", error);
       } finally {
@@ -60,9 +57,42 @@ export default function Home() {
       }
     };
 
+    const getDataVotacao = async () => {
+      try {
+        const dataStr = await AsyncStorage.getItem("dataVotacao");
+        if (dataStr) {
+          const dataVotacao = new Date(dataStr);
+          iniciarContagemRegressiva(dataVotacao);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar data de votação:", error);
+      }
+    };
+
     fetchUser();
     fetchCandidatos();
+    getDataVotacao();
   }, []);
+
+  const iniciarContagemRegressiva = (dataAlvo: Date) => {
+    setInterval(() => {
+      const agora = new Date().getTime();
+      const alvo = dataAlvo.getTime();
+      const restante = alvo - agora;
+
+      if (restante <= 0) {
+        setTempoRestante({ dias: 0, horas: 0, minutos: 0, segundos: 0 });
+        return;
+      }
+
+      const dias = Math.floor(restante / (1000 * 60 * 60 * 24));
+      const horas = Math.floor((restante % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutos = Math.floor((restante % (1000 * 60 * 60)) / (1000 * 60));
+      const segundos = Math.floor((restante % (1000 * 60)) / 1000);
+
+      setTempoRestante({ dias, horas, minutos, segundos });
+    }, 1000);
+  };
 
   if (loading) {
     return <ActivityIndicator size="large" color="#6C63FF" style={styles.loading} />;
@@ -70,14 +100,12 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
-      {/* Cabeçalho do perfil */}
+      {/* Cabeçalho */}
       <View style={styles.profileHeader}>
         <TouchableOpacity onPress={() => router.push("/perfil")}>
           <Image source={require("../assets/images/icon.png")} style={styles.profilePic} />
         </TouchableOpacity>
         <Text style={styles.name}>{user.primeiroNome}</Text>
-
-        {/* Botão exclusivo para Admin */}
         {user.role === "Admin" && (
           <TouchableOpacity style={styles.adminButton} onPress={() => router.push("/Campanha")}>
             <Text style={styles.profileButtonText}>Campanha</Text>
@@ -85,27 +113,35 @@ export default function Home() {
         )}
       </View>
 
-
       {/* Contagem Regressiva */}
       <View style={styles.countdownContainer}>
-        <Text style={styles.countdownTitle}>⏳ Tempo restante para a eleição</Text>
+        <View style={styles.countdownTitleContainer}>
+          <Ionicons style={styles.countdownIcon} name="hourglass" size={24} color="white" />
+          <Text style={styles.countdownTitle}> Tempo restante para a eleição</Text>
+        </View>
         <View style={styles.countdown}>
-          <View style={styles.countdownBox}><Text style={styles.countdownText}>124</Text><Text style={styles.countdownLabel}>Dias</Text></View>
-          <View style={styles.countdownBox}><Text style={styles.countdownText}>4</Text><Text style={styles.countdownLabel}>Horas</Text></View>
-          <View style={styles.countdownBox}><Text style={styles.countdownText}>30</Text><Text style={styles.countdownLabel}>Minutos</Text></View>
-          <View style={styles.countdownBox}><Text style={styles.countdownText}>29</Text><Text style={styles.countdownLabel}>Segundos</Text></View>
+          <View style={styles.countdownBox}><Text style={styles.countdownText}>{tempoRestante.dias}</Text><Text style={styles.countdownLabel}>Dias</Text></View>
+          <View style={styles.countdownBox}><Text style={styles.countdownText}>{tempoRestante.horas}</Text><Text style={styles.countdownLabel}>Horas</Text></View>
+          <View style={styles.countdownBox}><Text style={styles.countdownText}>{tempoRestante.minutos}</Text><Text style={styles.countdownLabel}>Minutos</Text></View>
+          <View style={styles.countdownBox}><Text style={styles.countdownText}>{tempoRestante.segundos}</Text><Text style={styles.countdownLabel}>Segundos</Text></View>
         </View>
       </View>
 
-      {/* Título de Candidatos */}
+      {/* Lista de Candidatos */}
       <Text style={styles.sectionTitle}>Candidatos Presidenciais</Text>
       <FlashList
         data={candidatos}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <View style={styles.candidateCard}>
-            <Image source={item.imagem ? { uri: item.imagem } : require("../assets/images/icon.png")}
-              style={styles.candidateImage} />
+            <Image
+              source={
+                item.imagem?.startsWith("/")
+                  ? { uri: `http://192.168.1.183:5000${item.imagem}` }
+                  : require("../assets/images/icon.png")
+              }
+              style={styles.candidateImage}
+            />
             <View style={styles.candidateInfo}>
               <Text style={styles.candidateName}>{item.nome}</Text>
               <Text style={styles.candidateParty}>{item.partido}</Text>
@@ -119,7 +155,7 @@ export default function Home() {
           </View>
         )}
         estimatedItemSize={80}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        contentContainerStyle={{ paddingBottom: 80 }}
       />
     </View>
   );
@@ -132,7 +168,9 @@ const styles = StyleSheet.create({
   name: { fontSize: 22, fontWeight: "bold", marginLeft: 10 },
   sectionTitle: { fontSize: 18, fontWeight: "bold", marginVertical: 20, textAlign: "center" },
   countdownContainer: { backgroundColor: "#4B2AFA", borderRadius: 10, padding: 15, marginBottom: 20, marginHorizontal: 20 },
-  countdownTitle: { color: "#fff", fontSize: 14, textAlign: "center", marginBottom: 10 },
+  countdownTitleContainer: { flexDirection: "row", alignItems: "center", justifyContent: "center" },
+  countdownIcon: { marginRight: 8, },
+  countdownTitle: { color: "#fff", fontSize: 14 },
   countdown: { flexDirection: "row", justifyContent: "space-around" },
   countdownBox: { alignItems: "center" },
   countdownText: { color: "#fff", fontSize: 22, fontWeight: "bold" },

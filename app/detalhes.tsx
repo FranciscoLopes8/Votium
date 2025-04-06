@@ -10,12 +10,12 @@ interface Candidato {
   nascimento: string;
   naturalidade: string;
   biografia: string;
-  imagem: string; // URL
+  imagem: string | null; // Permite imagem nula
 }
 
 export default function CandidateDetails() {
   const navigation = useNavigation();
-  const { id } = useLocalSearchParams(); 
+  const { id } = useLocalSearchParams();
   const [modalVisible, setModalVisible] = useState(false);
   const [candidato, setCandidato] = useState<Candidato | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,7 +29,7 @@ export default function CandidateDetails() {
       }
 
       try {
-        const response = await fetch("http://192.168.115.116:5000/candidates");
+        const response = await fetch("http://192.168.1.183:5000/candidates");
 
         const contentType = response.headers.get("content-type");
         if (!response.ok || !contentType || !contentType.includes("application/json")) {
@@ -75,7 +75,10 @@ export default function CandidateDetails() {
       </TouchableOpacity>
 
       {/* Imagem do Candidato */}
-      <Image source={{ uri: candidato.imagem }} style={styles.image} />
+      <Image 
+        source={candidato.imagem ? { uri: `http://192.168.1.183:5000${candidato.imagem}` } : require("../assets/images/icon.png")}
+        style={styles.image} 
+      />
       <Text style={styles.name}>{candidato.nome}</Text>
       <Text style={styles.party}>{candidato.partido}</Text>
 

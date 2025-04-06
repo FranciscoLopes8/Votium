@@ -18,7 +18,7 @@ export default function Profile() {
           return;
         }
 
-        const response = await fetch("http://192.168.115.116:5000/auth/perfil", {
+        const response = await fetch("http://192.168.1.183:5000/auth/perfil", {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
