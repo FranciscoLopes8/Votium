@@ -1,4 +1,3 @@
-// authPerfil.js
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
@@ -13,7 +12,7 @@ const authMiddleware = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded; 
+        req.user = decoded;
         next();
     } catch (error) {
         res.status(401).json({ message: "Token inválido" });
@@ -23,7 +22,7 @@ const authMiddleware = (req, res, next) => {
 
 router.get("/perfil", authMiddleware, async (req, res) => {
     try {
-        const userId = req.user.id;  
+        const userId = req.user.id;
         const user = await User.findById(userId);
 
         if (!user) {
@@ -37,6 +36,7 @@ router.get("/perfil", authMiddleware, async (req, res) => {
             telefone: user.telefone,
             role: user.role,
             codigoPessoal: user.codigoPessoal,
+            imagem: user.imagem,
         });
     } catch (error) {
         console.log(error);

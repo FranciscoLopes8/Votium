@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from '@expo/vector-icons';
@@ -8,19 +8,17 @@ import { router } from "expo-router";
 export default function DadosCandidato() {
   const navigation = useNavigation();
 
-  
   const [nome, setNome] = useState("");
   const [partido, setPartido] = useState("");
-  const [nascimento, setNascimento] = useState("");  
+  const [nascimento, setNascimento] = useState("");
   const [naturalidade, setNaturalidade] = useState("");
   const [biografia, setBiografia] = useState("");
   const [plano, setPlano] = useState("");
   const [foto, setFoto] = useState<string | null>(null);
 
-  
   const escolherFoto = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images, 
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 1,
     });
@@ -30,7 +28,6 @@ export default function DadosCandidato() {
     }
   };
 
-  
   const guardarCandidato = async () => {
     if (!nome || !partido || !nascimento || !naturalidade || !biografia || !plano || !foto) {
       alert("Por favor, preencha todos os campos.");
@@ -57,14 +54,14 @@ export default function DadosCandidato() {
     }
 
     try {
-      const response = await fetch("http://192.168.1.80:5000/candidates", {
+      const response = await fetch("http://192.168.1.183:5000/candidates", {
         method: "POST",
         body: formData,
       });
 
       if (response.ok) {
-        router.push("/Campanha");
         alert("Candidato guardado com sucesso!");
+        router.push("/Campanha");
         navigation.goBack();
       } else {
         alert("Erro ao guardar o candidato.");
@@ -89,59 +86,82 @@ export default function DadosCandidato() {
         {/* Título */}
         <Text style={styles.title}>Dados do Candidato</Text>
 
-        {/* Inputs */}
-        <TextInput
-          style={styles.input}
-          placeholder="Insira o nome do candidato"
-          value={nome}
-          onChangeText={setNome}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Insira o partido do candidato"
-          value={partido}
-          onChangeText={setPartido}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Insira o país de nascimento"
-          value={nascimento}  // Alterado para 'nascimento'
-          onChangeText={setNascimento}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Insira a naturalidade"
-          value={naturalidade}
-          onChangeText={setNaturalidade}
-        />
+        {/* Nome */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Nome do candidato"
+            value={nome}
+            onChangeText={setNome}
+            placeholderTextColor="#aaa"
+          />
+        </View>
 
-        {/* Upload de Foto */}
+        {/* Partido */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Partido"
+            value={partido}
+            onChangeText={setPartido}
+            placeholderTextColor="#aaa"
+          />
+        </View>
+
+        {/* Nascimento */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="País de nascimento"
+            value={nascimento}
+            onChangeText={setNascimento}
+            placeholderTextColor="#aaa"
+          />
+        </View>
+
+        {/* Naturalidade */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Naturalidade"
+            value={naturalidade}
+            onChangeText={setNaturalidade}
+            placeholderTextColor="#aaa"
+          />
+        </View>
+
+        {/* Botão de Foto */}
         <TouchableOpacity style={styles.fotoButton} onPress={escolherFoto}>
-          <Text>
-            <Ionicons name="camera" size={30} color="#333" /> {/* Ícone da câmera */}
-          </Text>
+          <Ionicons name="camera" size={30} color="#333" />
           <Text style={styles.fotoText}>Escolher fotografia</Text>
         </TouchableOpacity>
         {foto && <Image source={{ uri: foto }} style={styles.fotoPreview} />}
 
-        {/* Campos grandes */}
-        <TextInput
-          style={[styles.input, styles.textArea]}
-          placeholder="Insira a biografia do candidato..."
-          value={biografia}
-          onChangeText={setBiografia}
-          multiline
-          numberOfLines={4}
-        />
+        {/* Biografia */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            placeholder="Biografia do candidato..."
+            value={biografia}
+            onChangeText={setBiografia}
+            placeholderTextColor="#aaa"
+            multiline
+            numberOfLines={4}
+          />
+        </View>
 
-        <TextInput
-          style={[styles.input, styles.textArea]}
-          placeholder="Insira o plano de campanha..."
-          value={plano}
-          onChangeText={setPlano}
-          multiline
-          numberOfLines={4}
-        />
+        {/* Plano de Campanha */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            placeholder="Plano de campanha..."
+            value={plano}
+            onChangeText={setPlano}
+            placeholderTextColor="#aaa"
+            multiline
+            numberOfLines={4}
+          />
+        </View>
 
         {/* Botão Guardar */}
         <TouchableOpacity style={styles.button} onPress={guardarCandidato}>
@@ -180,14 +200,19 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     marginBottom: 20,
-    textAlign: "left",
     marginTop: 30,
+    textAlign: "center",
+  },
+  inputContainer: {
+    width: "100%",
+    marginBottom: 15,
   },
   input: {
+    width: "100%",
+    height: 50,
     backgroundColor: "#F5F5F5",
     borderRadius: 10,
-    padding: 15,
-    marginBottom: 15,
+    paddingHorizontal: 15,
   },
   textArea: {
     height: 100,
@@ -199,6 +224,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
     alignItems: "center",
+    flexDirection: "column",
   },
   fotoText: {
     color: "#333",

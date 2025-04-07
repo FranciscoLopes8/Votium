@@ -11,7 +11,7 @@ export default function RootLayout() {
 
   const [selectedTab, setSelectedTab] = useState("home");
 
-  if (pathname === "/login" || pathname === "/create" || pathname === "/") {
+  if (pathname === "/login" || pathname === "/create" || pathname === "/" || pathname == "/onboarding") {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaView style={styles.safeArea}>

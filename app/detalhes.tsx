@@ -76,7 +76,7 @@ export default function CandidateDetails() {
 
       {/* Imagem do Candidato */}
       <Image 
-        source={candidato.imagem ? { uri: `http://192.168.1.80:5000${candidato.imagem}` } : require("../assets/images/icon.png")}
+        source={candidato.imagem ? { uri: `http://192.168.1.183:5000${candidato.imagem}` } : require("../assets/images/icon.png")}
         style={styles.image} 
       />
       <Text style={styles.name}>{candidato.nome}</Text>

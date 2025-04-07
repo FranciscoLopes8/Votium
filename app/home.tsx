@@ -14,7 +14,7 @@ interface Candidato {
 
 export default function Home() {
   const router = useRouter();
-  const [user, setUser] = useState({ primeiroNome: "", ultimoNome: "", role: "", codigoPessoal: "" });
+  const [user, setUser] = useState({ primeiroNome: "", ultimoNome: "", role: "", codigoPessoal: "", imagem: "" });
   const [candidatos, setCandidatos] = useState<Candidato[]>([]);
   const [loading, setLoading] = useState(true);
   const [tempoRestante, setTempoRestante] = useState({ dias: 0, horas: 0, minutos: 0, segundos: 0 });
@@ -28,7 +28,7 @@ export default function Home() {
           return;
         }
 
-        const response = await fetch("http://192.168.1.80:5000/auth/perfil", {
+        const response = await fetch("http://192.168.1.183:5000/auth/perfil", {
           method: "GET",
           headers: { "Authorization": `Bearer ${token}` },
         });
@@ -47,7 +47,7 @@ export default function Home() {
 
     const fetchCandidatos = async () => {
       try {
-        const response = await fetch("http://192.168.1.80:5000/candidates");
+        const response = await fetch("http://192.168.1.183:5000/candidates");
         const data: Candidato[] = await response.json();
         setCandidatos(data);
       } catch (error) {
@@ -103,7 +103,11 @@ export default function Home() {
       {/* Cabeçalho */}
       <View style={styles.profileHeader}>
         <TouchableOpacity onPress={() => router.push("/perfil")}>
-          <Image source={require("../assets/images/icon.png")} style={styles.profilePic} />
+          <Image source={
+            user.imagem?.startsWith("/")
+              ? { uri: `http://192.168.1.183:5000${user.imagem}` }
+              : require("../assets/images/icon.png")
+          } style={styles.profilePic} />
         </TouchableOpacity>
         <Text style={styles.name}>{user.primeiroNome}</Text>
         {user.role === "Admin" && (
@@ -137,7 +141,7 @@ export default function Home() {
             <Image
               source={
                 item.imagem?.startsWith("/")
-                  ? { uri: `http://192.168.1.80:5000${item.imagem}` }
+                  ? { uri: `http://192.168.1.183:5000${item.imagem}` }
                   : require("../assets/images/icon.png")
               }
               style={styles.candidateImage}

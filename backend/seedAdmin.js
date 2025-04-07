@@ -15,7 +15,8 @@ const seedAdmin = async () => {
             telefone: "000000000",
             senha: hashedPassword,
             role: "Admin",
-            codigoPessoal: "00000000"
+            codigoPessoal: "00000000",
+            imagem: "https://via.placeholder.com/150"
         });
 
         await adminUser.save();

@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   skipText: {
-    color: "#6C63FF",
+    color: "#4B2AFA",
     fontSize: 16,
   },
   slide: {
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   nextButton: {
-    backgroundColor: "#6C63FF",
+    backgroundColor: "#4B2AFA",
     padding: 15,
     marginHorizontal: 40,
     borderRadius: 10,

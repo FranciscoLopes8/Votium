@@ -20,7 +20,7 @@ export default function Success() {
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#fff" },
   card: { backgroundColor: "#fff", padding: 20, borderRadius: 10, alignItems: "center", elevation: 5 },
-  message: { fontSize: 18, fontWeight: "bold", color: "#6C63FF", marginBottom: 20 },
-  backButton: { backgroundColor: "#6C63FF", padding: 10, borderRadius: 5, width: 100, alignItems: "center" },
+  message: { fontSize: 18, fontWeight: "bold", color: "#4B2AFA", marginBottom: 20 },
+  backButton: { backgroundColor: "#4B2AFA", padding: 10, borderRadius: 5, width: 100, alignItems: "center" },
   backText: { color: "#fff", fontWeight: "bold" },
 });

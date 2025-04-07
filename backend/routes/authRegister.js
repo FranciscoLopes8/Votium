@@ -2,7 +2,6 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const crypto = require('crypto');
 
 const router = express.Router();
 
@@ -21,16 +20,32 @@ router.post("/register", async (req, res) => {
 
     try {
         const userExistente = await User.findOne({ telefone });
-        if (userExistente) return res.status(400).json({ message: "Telefone já registado" });
+        if (userExistente) {
+            return res.status(400).json({ message: "Telefone já registado" });
+        }
 
-        const senhaHash = await bcrypt.hash(senha, 10);
+        const salt = await bcrypt.genSalt(10);
+        const senhaHash = await bcrypt.hash(senha, salt);
         const codigoPessoal = generateSecureCode();
 
-        const novoUsuario = new User({ primeiroNome, ultimoNome, telefone, senha: senhaHash, role: role || "user", codigoPessoal: codigoPessoal });
+        const novoUsuario = new User({
+            primeiroNome,
+            ultimoNome,
+            telefone,
+            senha: senhaHash,
+            role,
+            codigoPessoal
+        });
+
         await novoUsuario.save();
 
         const token = jwt.sign(
-            { id: novoUsuario._id, telefone: novoUsuario.telefone, role: novoUsuario.role, codigoPessoal: novoUsuario.codigoPessoal },
+            {
+                id: novoUsuario._id,
+                telefone: novoUsuario.telefone,
+                role: novoUsuario.role,
+                codigoPessoal: novoUsuario.codigoPessoal
+            },
             process.env.JWT_SECRET,
             { expiresIn: "2h" }
         );
@@ -47,7 +62,7 @@ router.post("/register", async (req, res) => {
             },
         });
     } catch (error) {
-        console.log(error);
+        console.error("Erro ao registar usuário:", error);
         res.status(500).json({ message: "Erro no servidor" });
     }
 });

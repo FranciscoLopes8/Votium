@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function Profile() {
   const router = useRouter();
   const [showCode, setShowCode] = useState(false);
-  const [user, setUser] = useState({ primeiroNome: "", ultimoNome: "", role: "", codigoPessoal: "" });
+  const [user, setUser] = useState({ primeiroNome: "", ultimoNome: "", role: "", codigoPessoal: "", imagem: "" });
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -18,7 +18,7 @@ export default function Profile() {
           return;
         }
 
-        const response = await fetch("http://192.168.1.80:5000/auth/perfil", {
+        const response = await fetch("http://192.168.1.183:5000/auth/perfil", {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -28,7 +28,7 @@ export default function Profile() {
         const data = await response.json();
 
         if (response.ok) {
-          setUser(data);  
+          setUser(data);
         } else {
           alert("Erro ao carregar perfil");
         }
@@ -43,7 +43,11 @@ export default function Profile() {
   return (
     <View style={styles.container}>
       {/* Perfil */}
-      <Image source={require("../assets/images/icon.png")} style={styles.profilePic} />
+      <Image source={
+        user.imagem?.startsWith("/")
+          ? { uri: `http://192.168.1.183:5000${user.imagem}` }
+          : require("../assets/images/icon.png")
+      } style={styles.profilePic} />
       <Text style={styles.name}>{user.primeiroNome} {user.ultimoNome}</Text>
       <Text style={styles.role}>{user.role}</Text>
       <TouchableOpacity style={styles.editButton} onPress={() => router.push("/editar")}>
