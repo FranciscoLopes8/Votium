@@ -1,6 +1,13 @@
 import React, { useRef, useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from "react-native";
-import { FlashList } from "@shopify/flash-list";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+  FlatList,
+} from "react-native";
 import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window");
@@ -16,7 +23,8 @@ const slides: Slide[] = [
   {
     key: "1",
     title: "Bem-Vindo ao Votium",
-    description: "A aplicação eleitoral online fundamentada na blockchain. Cria a tua conta e vota com total segurança e transparência.",
+    description:
+      "A aplicação eleitoral online fundamentada na blockchain. Cria a tua conta e vota com total segurança e transparência.",
     image: require("../assets/images/onboarding1.png"),
   },
   {
@@ -35,19 +43,16 @@ const slides: Slide[] = [
 
 export default function OnboardingScreen() {
   const router = useRouter();
-  const flashListRef = useRef<FlashList<Slide>>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  const handleNext = () => {
-    if (currentIndex < slides.length - 1) {
-      flashListRef.current?.scrollToIndex({ index: currentIndex + 1 });
-    } else {
-      router.replace("/login");
-    }
-  };
+  const flatListRef = useRef<FlatList<Slide>>(null);
 
   const handleSkip = () => {
     router.replace("/login");
+  };
+
+  const handleScroll = (event: any) => {
+    const index = Math.round(event.nativeEvent.contentOffset.x / width);
+    setCurrentIndex(index);
   };
 
   const renderItem = ({ item }: { item: Slide }) => (
@@ -64,23 +69,29 @@ export default function OnboardingScreen() {
         <Text style={styles.skipText}>Skip</Text>
       </TouchableOpacity>
 
-      <FlashList
-        ref={flashListRef}
+      <FlatList
+        ref={flatListRef}
         data={slides}
         renderItem={renderItem}
+        keyExtractor={(item) => item.key}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        estimatedItemSize={width}
-        onScroll={(e) => {
-          const index = Math.round(e.nativeEvent.contentOffset.x / width);
-          setCurrentIndex(index);
-        }}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
       />
 
-      <TouchableOpacity onPress={handleNext} style={styles.nextButton}>
-        <Text style={styles.nextText}>{currentIndex === slides.length - 1 ? "Começar" : "Seguinte"}</Text>
-      </TouchableOpacity>
+      <View style={styles.pagination}>
+        {slides.map((_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.dot,
+              { opacity: currentIndex === index ? 1 : 0.3 },
+            ]}
+          />
+        ))}
+      </View>
     </View>
   );
 }
@@ -94,7 +105,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 50,
     right: 20,
-    zIndex: 10,
+    zIndex: 1,
   },
   skipText: {
     color: "#4B2AFA",
@@ -103,8 +114,8 @@ const styles = StyleSheet.create({
   slide: {
     width: width,
     alignItems: "center",
-    padding: 20,
     justifyContent: "center",
+    paddingHorizontal: 20,
   },
   image: {
     width: 250,
@@ -122,23 +133,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#777",
     textAlign: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
   },
-  nextButton: {
-    backgroundColor: "#4B2AFA",
-    padding: 15,
-    marginHorizontal: 40,
-    borderRadius: 10,
+  pagination: {
+    flexDirection: "row",
+    justifyContent: "center",
     marginBottom: 30,
-    alignItems: "center",
-    position: "absolute",
-    bottom: 20,
-    left: 0,
-    right: 0,
   },
-  nextText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#4B2AFA",
+    marginHorizontal: 5,
   },
 });
