@@ -1,4 +1,4 @@
-const voto = artifacts.require("Votacao");
+const voto = artifacts.require("Voto");
 
 module.exports = function (deployer) {
   deployer.deploy(voto);

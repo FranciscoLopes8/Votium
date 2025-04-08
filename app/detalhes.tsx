@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, ActivityIndicator } from "react-native";
-import { useLocalSearchParams } from "expo-router";
-import { useNavigation } from "@react-navigation/native";
+import { router, useLocalSearchParams } from "expo-router";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getVotoContract } from "./contracts/votoContract";
 
 interface Candidato {
   _id: string;
@@ -10,15 +11,16 @@ interface Candidato {
   nascimento: string;
   naturalidade: string;
   biografia: string;
-  imagem: string | null; // Permite imagem nula
+  imagem: string | null;
 }
 
+
 export default function CandidateDetails() {
-  const navigation = useNavigation();
   const { id } = useLocalSearchParams();
   const [modalVisible, setModalVisible] = useState(false);
   const [candidato, setCandidato] = useState<Candidato | null>(null);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState({ telefone: "", codigoPessoal: "" });
 
   useEffect(() => {
     const fetchCandidate = async () => {
@@ -29,7 +31,7 @@ export default function CandidateDetails() {
       }
 
       try {
-        const response = await fetch("http://192.168.1.80:5000/candidates");
+        const response = await fetch("http://192.168.1.170:5000/candidates");
 
         const contentType = response.headers.get("content-type");
         if (!response.ok || !contentType || !contentType.includes("application/json")) {
@@ -53,7 +55,34 @@ export default function CandidateDetails() {
       }
     };
 
+    const fetchUser = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        if (!token) {
+          router.push("./authLogin");
+          return;
+        }
+
+        const response = await fetch("http://192.168.1.170:5000/auth/perfil", {
+          method: "GET",
+          headers: { "Authorization": `Bearer ${token}` },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setUser(data);
+        } else {
+          alert("Erro ao carregar perfil");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar perfil:", error);
+      }
+
+    };
+
     fetchCandidate();
+    fetchUser();
   }, [id]);
 
   if (loading) {
@@ -70,14 +99,16 @@ export default function CandidateDetails() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+      <TouchableOpacity onPress={() => router.push("/home")} style={styles.backButton}>
         <Text style={styles.backText}>{"<"}</Text>
       </TouchableOpacity>
 
       {/* Imagem do Candidato */}
-      <Image 
-        source={candidato.imagem ? { uri: `http://192.168.1.183:5000${candidato.imagem}` } : require("../assets/images/icon.png")}
-        style={styles.image} 
+      <Image
+        source={candidato.imagem?.startsWith("/")
+          ? { uri: `http://192.168.1.170:5000${candidato.imagem}` }
+          : require("../assets/images/icon.png")}
+        style={styles.image}
       />
       <Text style={styles.name}>{candidato.nome}</Text>
       <Text style={styles.party}>{candidato.partido}</Text>
@@ -85,11 +116,11 @@ export default function CandidateDetails() {
       {/* Botão de Votação */}
       <TouchableOpacity style={styles.voteButton} onPress={() => setModalVisible(true)}>
         <Text style={styles.voteText}>Vote now</Text>
-      </TouchableOpacity>       
+      </TouchableOpacity>
 
       {/* Tabs de Informação */}
       <View style={styles.tabs}>
-        <Text style={styles.activeTab}>Profile</Text> 
+        <Text style={styles.activeTab}>Profile</Text>
         <Text style={styles.inactiveTab}>Campaign</Text>
       </View>
 
@@ -117,7 +148,22 @@ export default function CandidateDetails() {
               <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
                 <Text style={styles.cancelText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.confirmButton}>
+              <TouchableOpacity
+                style={styles.confirmButton}
+                onPress={async () => {
+                  try {
+                    const contrato = getVotoContract();
+                    const tx = await contrato.votar(user.codigoPessoal, id);
+                    await tx.wait();
+
+                    alert("Voto registado com sucesso!");
+                    setModalVisible(false);
+                  } catch (err) {
+                    console.log(err);
+                    alert("Erro ao registar voto. Tente novamente.");
+                  }
+                }}
+              >
                 <Text style={styles.confirmText}>Confirm</Text>
               </TouchableOpacity>
             </View>
