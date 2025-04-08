@@ -18,7 +18,7 @@ export default function Profile() {
           return;
         }
 
-        const response = await fetch("http://192.168.1.183:5000/auth/perfil", {
+        const response = await fetch("http://192.168.1.170:5000/auth/perfil", {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -45,7 +45,7 @@ export default function Profile() {
       {/* Perfil */}
       <Image source={
         user.imagem?.startsWith("/")
-          ? { uri: `http://192.168.1.183:5000${user.imagem}` }
+          ? { uri: `http://192.168.1.170:5000${user.imagem}` }
           : require("../assets/images/icon.png")
       } style={styles.profilePic} />
       <Text style={styles.name}>{user.primeiroNome} {user.ultimoNome}</Text>

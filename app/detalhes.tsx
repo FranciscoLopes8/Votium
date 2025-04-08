@@ -21,6 +21,8 @@ export default function CandidateDetails() {
   const [candidato, setCandidato] = useState<Candidato | null>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState({ telefone: "", codigoPessoal: "" });
+  const [candidatoIdMap, setCandidatoIdMap] = useState<Record<string, number>>({});
+
 
   useEffect(() => {
     const fetchCandidate = async () => {
@@ -39,6 +41,12 @@ export default function CandidateDetails() {
         }
 
         const data: Candidato[] = await response.json();
+
+        const map: Record<string, number> = {};
+        data.forEach((c, index) => {
+          map[c._id] = index + 1;
+        });
+        setCandidatoIdMap(map);
 
         const candidatoEncontrado = data.find((c) => c._id === id);
 
@@ -153,13 +161,20 @@ export default function CandidateDetails() {
                 onPress={async () => {
                   try {
                     const contrato = getVotoContract();
-                    const tx = await contrato.votar(user.codigoPessoal, id);
+
+                    const contractId = candidatoIdMap[id as string];
+                    if (!contractId) {
+                      alert("ID do candidato inválido para votação.");
+                      return;
+                    }
+
+                    const tx = await contrato.votar(contractId, user.codigoPessoal, { gasLimit: 1000000 });
                     await tx.wait();
 
                     alert("Voto registado com sucesso!");
                     setModalVisible(false);
                   } catch (err) {
-                    console.log(err);
+                    console.log("Erro ao votar:", err);
                     alert("Erro ao registar voto. Tente novamente.");
                   }
                 }}

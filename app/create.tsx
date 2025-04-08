@@ -21,7 +21,7 @@ export default function CriarConta() {
     }
 
     try {
-      const response = await fetch("http://192.168.1.183:5000/auth/register", {
+      const response = await fetch("http://192.168.1.170:5000/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ primeiroNome, ultimoNome, telefone, senha, role }),
@@ -50,7 +50,7 @@ export default function CriarConta() {
           return;
         }
 
-        const response = await fetch("http://192.168.1.183:5000/auth/perfil", {
+        const response = await fetch("http://192.168.1.170:5000/auth/perfil", {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,

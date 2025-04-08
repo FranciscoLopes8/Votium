@@ -17,7 +17,7 @@ export default function Index() {
     }
 
     try {
-      const response = await fetch("http://192.168.1.183:5000/auth/login", {
+      const response = await fetch("http://192.168.1.170:5000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ telefone, password }),
