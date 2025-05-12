@@ -4,6 +4,8 @@ import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 
+const IP = "192.168.1.170";
+
 export default function Index() {
   const [telefone, setTelefone] = useState("");
   const [password, setPassword] = useState("");
@@ -17,7 +19,7 @@ export default function Index() {
     }
 
     try {
-      const response = await fetch("http://192.168.1.170:5000/auth/login", {
+      const response = await fetch(`http://${IP}:5000/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ telefone, password }),

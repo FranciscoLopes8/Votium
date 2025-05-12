@@ -4,6 +4,8 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const IP = "192.168.1.170";
+
 export default function Profile() {
   const router = useRouter();
   const [showCode, setShowCode] = useState(false);
@@ -18,7 +20,7 @@ export default function Profile() {
           return;
         }
 
-        const response = await fetch("http://192.168.1.170:5000/auth/perfil", {
+        const response = await fetch(`http://${IP}:5000/auth/perfil`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -45,7 +47,7 @@ export default function Profile() {
       {/* Perfil */}
       <Image source={
         user.imagem?.startsWith("/")
-          ? { uri: `http://192.168.1.170:5000${user.imagem}` }
+          ? { uri: `http://${IP}:5000${user.imagem}` }
           : require("../assets/images/icon.png")
       } style={styles.profilePic} />
       <Text style={styles.name}>{user.primeiroNome} {user.ultimoNome}</Text>

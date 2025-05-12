@@ -16,7 +16,8 @@ const seedAdmin = async () => {
             senha: hashedPassword,
             role: "Admin",
             codigoPessoal: "00000000",
-            imagem: "https://via.placeholder.com/150"
+            imagem: "",
+            walletPrivateKey: "0xd9e4fe7efb52d1c3ae114f5d9ecffb68755246d9dcf6068190ec3ebd78cc4947"
         });
 
         await adminUser.save();

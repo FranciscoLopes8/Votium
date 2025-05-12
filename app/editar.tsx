@@ -5,6 +5,8 @@ import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const IP = "192.168.1.170";
+
 export default function EditarPerfil() {
   const router = useRouter();
 
@@ -26,7 +28,7 @@ export default function EditarPerfil() {
           return;
         }
 
-        const response = await fetch("http://192.168.1.170:5000/auth/perfil", {
+        const response = await fetch(`http://${IP}:5000/auth/perfil`, {
           method: "GET",
           headers: { "Authorization": `Bearer ${token}` },
         });
@@ -37,7 +39,7 @@ export default function EditarPerfil() {
           setUser(data);
           setNome(data.primeiroNome);
           setSobrenome(data.ultimoNome);
-          setImagem(data.imagem ? `http://192.168.1.170:5000${data.imagem}` : null);
+          setImagem(data.imagem ? `http://${IP}:5000${data.imagem}` : null);
         } else {
           alert("Erro ao carregar perfil");
         }
@@ -88,7 +90,7 @@ export default function EditarPerfil() {
     }
 
     try {
-      const response = await fetch(`http://192.168.1.170:5000/perfil/${user.telefone}`, {
+      const response = await fetch(`http://${IP}:5000/perfil/${user.telefone}`, {
         method: "PUT",
         body: formData,
         headers: {

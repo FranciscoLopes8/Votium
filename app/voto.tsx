@@ -1,15 +1,9 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TextInput,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
 import { getVotoContract } from "./contracts/votoContract";
 import { Ionicons } from "@expo/vector-icons";
+
+const IP = "192.168.1.170";
 
 export default function Voto() {
   const [codigoPessoal, setCodigoPessoal] = useState("");
@@ -30,7 +24,7 @@ export default function Voto() {
 
   const buscarCandidato = async (id: number) => {
     try {
-      const res = await fetch("http://192.168.1.170:5000/candidates");
+      const res = await fetch(`http://${IP}:5000/candidates`);
       const data = await res.json();
 
       const map: Record<number, string> = {};
@@ -54,7 +48,7 @@ export default function Voto() {
 
     try {
       setCarregando(true);
-      const contrato = getVotoContract();
+      const contrato = await getVotoContract();
       const candidatoId: number = await contrato.consultarVoto(codigoPessoal);
       await buscarCandidato(Number(candidatoId));
       setFirstTime(false); // Marca como já verificado

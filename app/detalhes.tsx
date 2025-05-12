@@ -4,6 +4,8 @@ import { router, useLocalSearchParams } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getVotoContract } from "./contracts/votoContract";
 
+const IP = "192.168.1.170";
+
 interface Candidato {
   _id: string;
   nome: string;
@@ -33,7 +35,7 @@ export default function CandidateDetails() {
       }
 
       try {
-        const response = await fetch("http://192.168.1.170:5000/candidates");
+        const response = await fetch(`http://${IP}:5000/candidates`);
 
         const contentType = response.headers.get("content-type");
         if (!response.ok || !contentType || !contentType.includes("application/json")) {
@@ -71,7 +73,7 @@ export default function CandidateDetails() {
           return;
         }
 
-        const response = await fetch("http://192.168.1.170:5000/auth/perfil", {
+        const response = await fetch(`http://${IP}:5000/auth/perfil`, {
           method: "GET",
           headers: { "Authorization": `Bearer ${token}` },
         });
@@ -114,7 +116,7 @@ export default function CandidateDetails() {
       {/* Imagem do Candidato */}
       <Image
         source={candidato.imagem?.startsWith("/")
-          ? { uri: `http://192.168.1.170:5000${candidato.imagem}` }
+          ? { uri: `http://${IP}:5000${candidato.imagem}` }
           : require("../assets/images/icon.png")}
         style={styles.image}
       />
@@ -160,7 +162,7 @@ export default function CandidateDetails() {
                 style={styles.confirmButton}
                 onPress={async () => {
                   try {
-                    const contrato = getVotoContract();
+                    const contrato = await getVotoContract();
 
                     const contractId = candidatoIdMap[id as string];
                     if (!contractId) {

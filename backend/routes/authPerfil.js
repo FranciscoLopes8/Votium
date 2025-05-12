@@ -37,6 +37,7 @@ router.get("/perfil", authMiddleware, async (req, res) => {
             role: user.role,
             codigoPessoal: user.codigoPessoal,
             imagem: user.imagem,
+            walletPrivateKey: user.walletPrivateKey,
         });
     } catch (error) {
         console.log(error);

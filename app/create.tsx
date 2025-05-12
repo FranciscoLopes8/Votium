@@ -4,6 +4,8 @@ import { useNavigation } from "@react-navigation/native";
 import { router } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const IP = "192.168.1.170";
+
 export default function CriarConta() {
   const navigation = useNavigation();
   const [primeiroNome, setPrimeiroNome] = useState("");
@@ -21,7 +23,7 @@ export default function CriarConta() {
     }
 
     try {
-      const response = await fetch("http://192.168.1.170:5000/auth/register", {
+      const response = await fetch(`http://${IP}:5000/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ primeiroNome, ultimoNome, telefone, senha, role }),
@@ -30,11 +32,11 @@ export default function CriarConta() {
       const data = await response.json();
 
       if (response.ok) {
-        
-        await AsyncStorage.setItem("token", data.token); 
-        router.push("/verification");  
+
+        await AsyncStorage.setItem("token", data.token);
+        router.push("/verification");
       } else {
-        alert(data.message);  
+        alert(data.message);
       }
     } catch (error) {
       alert("Erro ao conectar ao servidor.");
@@ -50,7 +52,7 @@ export default function CriarConta() {
           return;
         }
 
-        const response = await fetch("http://192.168.1.170:5000/auth/perfil", {
+        const response = await fetch(`http://${IP}:5000/auth/perfil`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,

@@ -5,6 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FlashList } from "@shopify/flash-list";
 import { Ionicons } from '@expo/vector-icons';
 
+const IP = "192.168.1.170";
+
 interface Candidato {
   _id: string;
   nome: string;
@@ -28,7 +30,7 @@ export default function Home() {
           return;
         }
 
-        const response = await fetch("http://192.168.1.170:5000/auth/perfil", {
+        const response = await fetch(`http://${IP}:5000/auth/perfil`, {
           method: "GET",
           headers: { "Authorization": `Bearer ${token}` },
         });
@@ -47,7 +49,7 @@ export default function Home() {
 
     const fetchCandidatos = async () => {
       try {
-        const response = await fetch("http://192.168.1.170:5000/candidates");
+        const response = await fetch(`http://${IP}:5000/candidates`);
         const data: Candidato[] = await response.json();
         setCandidatos(data);
       } catch (error) {
@@ -105,7 +107,7 @@ export default function Home() {
         <TouchableOpacity onPress={() => router.push("/perfil")}>
           <Image source={
             user.imagem?.startsWith("/")
-              ? { uri: `http://192.168.1.170:5000${user.imagem}` }
+              ? { uri: `http://${IP}:5000${user.imagem}` }
               : require("../assets/images/icon.png")
           } style={styles.profilePic} />
         </TouchableOpacity>
@@ -141,7 +143,7 @@ export default function Home() {
             <Image
               source={
                 item.imagem?.startsWith("/")
-                  ? { uri: `http://192.168.1.170:5000${item.imagem}` }
+                  ? { uri: `http://${IP}:5000${item.imagem}` }
                   : require("../assets/images/icon.png")
               }
               style={styles.candidateImage}

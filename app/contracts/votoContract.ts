@@ -1,23 +1,68 @@
-import React from "react";
 import { ethers } from "ethers";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// ABI do contrato (simplificado)
+const IP = "192.168.1.170";
+
+// ABI simples do contrato
 export const VOTO_ABI = [
     "function votar(uint256, string memory) public",
     "function consultarVoto(string memory) public view returns (uint256)"
 ];
 
-// Endereço do contrato 
-export const VOTO_ADDRESS = "0x71aD89B7499d3393D857370234003D7BB899AB56";
+export const VOTO_ADDRESS = "0x3aEc6Db1ccfa110741A1dce622Ff1B968243c1f3";
 
-// Private key 
-const PRIVATE_KEY = "0x8a67c17544c1a0da2f5de410452ea06c46c47f59470549744ce291f86a578de1";
+export const GANACHE_URL = "HTTP://192.168.1.170:7545";
 
-// URL
-const GANACHE_URL = "HTTP://192.168.1.170:7545";
+const fetchUserPrivateKey = async () => {
+    try {
+        const token = await AsyncStorage.getItem("token");
 
-export const getVotoContract = () => {
-    const provider = new ethers.providers.JsonRpcProvider(GANACHE_URL);
-    const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
-    return new ethers.Contract(VOTO_ADDRESS, VOTO_ABI, wallet);
+        if (!token) {
+            throw new Error("Token não encontrado.");
+        }
+
+        const response = await fetch(`http://${IP}:5000/auth/perfil`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+        console.log("Resposta da API /auth/perfil:", data);
+
+        if (!response.ok) {
+            throw new Error(`Erro ao buscar perfil: ${data.message || "Erro desconhecido"}`);
+        }
+
+        const { walletPrivateKey } = data;
+
+        if (!walletPrivateKey) {
+            throw new Error("Chave privada não encontrada.");
+        }
+
+
+        return walletPrivateKey;
+
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getVotoContract = async () => {
+    try {
+        const privateKey = await fetchUserPrivateKey();
+
+        const provider = new ethers.providers.JsonRpcProvider(GANACHE_URL);
+        const wallet = new ethers.Wallet(privateKey, provider);
+
+        const contrato = new ethers.Contract(VOTO_ADDRESS, VOTO_ABI, wallet);
+
+        return contrato;
+
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 };
