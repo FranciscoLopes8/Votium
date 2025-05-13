@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 const IP = "192.168.1.170";
 
+
 export default function Voto() {
   const [codigoPessoal, setCodigoPessoal] = useState("");
   const [candidatoNome, setCandidatoNome] = useState<string | null>(null);
