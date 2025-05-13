@@ -6,10 +6,11 @@ const IP = "192.168.1.170";
 // ABI simples do contrato
 export const VOTO_ABI = [
     "function votar(uint256, string memory) public",
-    "function consultarVoto(string memory) public view returns (uint256)"
+    "function consultarVoto(string memory) public view returns (uint256)",
+    "function jaVotou(address) public view returns (bool)"
 ];
 
-export const VOTO_ADDRESS = "0x3aEc6Db1ccfa110741A1dce622Ff1B968243c1f3";
+export const VOTO_ADDRESS = "0x9b278F5054DcbCf38c73C203548c0738DB6e4777";
 
 export const GANACHE_URL = "HTTP://192.168.1.170:7545";
 
@@ -29,7 +30,7 @@ const fetchUserPrivateKey = async () => {
         });
 
         const data = await response.json();
-        console.log("Resposta da API /auth/perfil:", data);
+
 
         if (!response.ok) {
             throw new Error(`Erro ao buscar perfil: ${data.message || "Erro desconhecido"}`);
@@ -66,3 +67,4 @@ export const getVotoContract = async () => {
         throw error;
     }
 };
+

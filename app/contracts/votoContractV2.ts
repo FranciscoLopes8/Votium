@@ -1,0 +1,133 @@
+import { ethers } from "ethers";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const IP = "192.168.1.170";
+
+// ABI do contrato
+export const VOTO_ABI = [
+    "function votar(uint256, string memory) public",
+    "function consultarVoto(string memory) public view returns (uint256)",
+    "function obterVotosPorCandidato(uint) public view returns (uint)",
+    "function obterTotalVotos() public view returns (uint)",
+    "function jaVotou(address) public view returns (bool)",
+];
+
+export const VOTO_ADDRESS = "0x08702D7231A1b64eB496090B9855176B07996316";
+
+export const GANACHE_URL = "HTTP://192.168.1.170:7545";
+
+const fetchUserPrivateKey = async () => {
+    try {
+        const token = await AsyncStorage.getItem("token");
+
+        if (!token) {
+            throw new Error("Token não encontrado.");
+        }
+
+        const response = await fetch(`http://${IP}:5000/auth/perfil`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`Erro ao buscar perfil: ${data.message || "Erro desconhecido"}`);
+        }
+
+        const { walletPrivateKey } = data;
+
+        if (!walletPrivateKey) {
+            throw new Error("Chave privada não encontrada.");
+        }
+
+        return walletPrivateKey;
+
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getVotoContract = async () => {
+    try {
+        const privateKey = await fetchUserPrivateKey();
+
+        const provider = new ethers.providers.JsonRpcProvider(GANACHE_URL);
+        const wallet = new ethers.Wallet(privateKey, provider);
+
+        const contrato = new ethers.Contract(VOTO_ADDRESS, VOTO_ABI, wallet);
+
+        return contrato;
+
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+// Função para votar
+export const votar = async (candidatoId: number, codigoPessoal: string) => {
+    try {
+        const contrato = await getVotoContract();
+
+        // Chamada à função de voto do contrato
+        const tx = await contrato.votar(candidatoId, codigoPessoal, { gasLimit: 1000000 });
+
+        // Espera pela confirmação da transação
+        await tx.wait();
+
+        alert("Voto registado com sucesso!");
+    } catch (error) {
+        console.error("Erro ao votar:", error);
+        alert("Erro ao registar voto. Tente novamente.");
+    }
+};
+
+// Função para consultar o voto com o código pessoal
+export const consultarVoto = async (codigoPessoal: string) => {
+    try {
+        const contrato = await getVotoContract();
+
+        // Chamada à função para consultar o voto
+        const candidatoId = await contrato.consultarVoto(codigoPessoal);
+
+        return candidatoId;
+    } catch (error) {
+        console.error("Erro ao consultar voto:", error);
+        throw error;
+    }
+};
+
+// Função para obter a quantidade de votos de um candidato
+export const obterVotosPorCandidato = async (candidatoId: number) => {
+    try {
+        const contrato = await getVotoContract();
+
+        // Chamada à função para obter votos por candidato
+        const votos = await contrato.obterVotosPorCandidato(candidatoId);
+        console.log(`Votos para o candidato ${candidatoId}:`, votos);  // Verificando a resposta
+
+        return votos;
+    } catch (error) {
+        console.error("Erro ao obter votos por candidato:", error);
+        throw error;
+    }
+};
+
+// Função para obter o total de votos
+export const obterTotalVotos = async () => {
+    try {
+        const contrato = await getVotoContract();
+
+        // Chamada à função para obter o total de votos
+        const totalVotos = await contrato.obterTotalVotos();
+
+        return totalVotos;
+    } catch (error) {
+        console.error("Erro ao obter total de votos:", error);
+        throw error;
+    }
+};

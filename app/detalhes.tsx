@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, ActivityIndicator } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getVotoContract } from "./contracts/votoContract";
+import { getVotoContract } from "./contracts/votoContractV2"; 
 
 const IP = "192.168.1.170";
 
@@ -16,7 +16,6 @@ interface Candidato {
   imagem: string | null;
 }
 
-
 export default function CandidateDetails() {
   const { id } = useLocalSearchParams();
   const [modalVisible, setModalVisible] = useState(false);
@@ -24,7 +23,6 @@ export default function CandidateDetails() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState({ telefone: "", codigoPessoal: "" });
   const [candidatoIdMap, setCandidatoIdMap] = useState<Record<string, number>>({});
-
 
   useEffect(() => {
     const fetchCandidate = async () => {
@@ -88,7 +86,6 @@ export default function CandidateDetails() {
       } catch (error) {
         console.error("Erro ao buscar perfil:", error);
       }
-
     };
 
     fetchCandidate();
@@ -162,7 +159,7 @@ export default function CandidateDetails() {
                 style={styles.confirmButton}
                 onPress={async () => {
                   try {
-                    const contrato = await getVotoContract();
+                    const contrato = await getVotoContract(); // Atualizado para usar o novo contrato
 
                     const contractId = candidatoIdMap[id as string];
                     if (!contractId) {

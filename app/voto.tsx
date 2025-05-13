@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
-import { getVotoContract } from "./contracts/votoContract";
+import { getVotoContract, obterVotosPorCandidato } from "./contracts/votoContractV2";
 import { Ionicons } from "@expo/vector-icons";
 
 const IP = "192.168.1.170";
@@ -12,15 +12,38 @@ export default function Voto() {
   const [votacaoTerminada] = useState(true);
   const [showVote, setShowVote] = useState(false);
   const [firstTime, setFirstTime] = useState(true);
+  const [resultados, setResultados] = useState<{ votos: number; id: number; partido: string; cor: string }[]>([]);
 
-  const resultados = [
-    { partido: "Frelimo", votos: 10743348, percentagem: 78, cor: "#00C853" },
-    { partido: "Renamo", votos: 1743348, percentagem: 18, cor: "#2962FF" },
-    { partido: "MDM", votos: 743348, percentagem: 7, cor: "#6A1B9A" },
-    { partido: "ND", votos: 113348, percentagem: 8, cor: "#FFD600" },
-    { partido: "CMS", votos: 17348, percentagem: 5, cor: "#FFAB00" },
-    { partido: "CMD", votos: 7348, percentagem: 1, cor: "#D50000" },
+  const candidatos = [
+    { id: 1, partido: "Frelimo", cor: "#00C853" },
+    { id: 2, partido: "Renamo", cor: "#2962FF" },
+    { id: 3, partido: "MDM", cor: "#6A1B9A" },
+    { id: 4, partido: "ND", cor: "#FFD600" },
+    { id: 5, partido: "CMS", cor: "#FFAB00" },
+    { id: 6, partido: "CMD", cor: "#D50000" },
   ];
+
+
+  useEffect(() => {
+    const carregarResultados = async () => {
+      try {
+        const resultadosVotacao = await Promise.all(
+          candidatos.map(async (candidato) => {
+            const votos = await obterVotosPorCandidato(candidato.id);
+            return { ...candidato, votos };
+          })
+        );
+
+        setResultados(resultadosVotacao);
+      } catch (err) {
+        console.error("Erro ao carregar resultados:", err);
+      }
+    };
+
+    if (votacaoTerminada) {
+      carregarResultados();
+    }
+  }, [votacaoTerminada]);
 
   const buscarCandidato = async (id: number) => {
     try {
@@ -50,11 +73,21 @@ export default function Voto() {
       setCarregando(true);
       const contrato = await getVotoContract();
       const candidatoId: number = await contrato.consultarVoto(codigoPessoal);
+
       await buscarCandidato(Number(candidatoId));
-      setFirstTime(false); // Marca como já verificado
-    } catch (err) {
+      setFirstTime(false);
+
+    } catch (err: any) {
       console.log("Erro ao consultar voto:", err);
-      alert("Código inválido ou erro ao consultar.");
+
+      const mensagemErro = err?.error?.data;
+
+      if (mensagemErro?.includes("Code not found") || err.message?.includes("Code not found")) {
+        alert("Ainda não votaste!");
+      } else {
+        alert("Código inválido ou erro ao consultar.");
+      }
+
     } finally {
       setCarregando(false);
     }
@@ -103,13 +136,13 @@ export default function Voto() {
             resultados.map((item, index) => (
               <View key={index} style={styles.resultContainer}>
                 <Text style={styles.partidoText}>
-                  {item.partido} - {item.percentagem}%
+                  {item.partido} - {((item.votos / 10000000) * 100).toFixed(2)}%
                 </Text>
                 <View style={styles.progressBarBackground}>
                   <View
                     style={{
                       ...styles.progressBarFill,
-                      width: `${item.percentagem}%`,
+                      width: (item.votos / 10000000) * 100,
                       backgroundColor: item.cor,
                     }}
                   />
@@ -129,7 +162,11 @@ export default function Voto() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 16 },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    padding: 16
+  },
   verificacaoContainer: {
     flex: 1,
     justifyContent: "center",
@@ -183,8 +220,16 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginTop: 5,
   },
-  headerTitle: { color: "#fff", fontSize: 16, fontWeight: "600" },
-  headerCandidato: { color: "#fff", fontSize: 20, fontWeight: "bold" },
+  headerTitle: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600"
+  },
+  headerCandidato: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold"
+  },
   waitingText: {
     textAlign: "center",
     fontSize: 16,
@@ -198,7 +243,11 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 15,
   },
-  partidoText: { fontSize: 16, fontWeight: "600", marginBottom: 5 },
+  partidoText: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 5
+  },
   progressBarBackground: {
     height: 10,
     backgroundColor: "#ccc",
@@ -210,5 +259,8 @@ const styles = StyleSheet.create({
     height: "100%",
     borderRadius: 5,
   },
-  votosText: { fontSize: 14, color: "#555" },
+  votosText: {
+    fontSize: 14,
+    color: "#555"
+  },
 });
