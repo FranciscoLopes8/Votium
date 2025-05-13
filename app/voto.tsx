@@ -23,7 +23,6 @@ export default function Voto() {
     { id: 6, partido: "CMD", cor: "#D50000" },
   ];
 
-
   useEffect(() => {
     const carregarResultados = async () => {
       try {
