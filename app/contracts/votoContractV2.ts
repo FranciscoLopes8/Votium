@@ -68,15 +68,13 @@ export const getVotoContract = async () => {
     }
 };
 
-// Função para votar
+
 export const votar = async (candidatoId: number, codigoPessoal: string) => {
     try {
         const contrato = await getVotoContract();
 
-        // Chamada à função de voto do contrato
         const tx = await contrato.votar(candidatoId, codigoPessoal, { gasLimit: 1000000 });
 
-        // Espera pela confirmação da transação
         await tx.wait();
 
         alert("Voto registado com sucesso!");
@@ -86,7 +84,6 @@ export const votar = async (candidatoId: number, codigoPessoal: string) => {
     }
 };
 
-// Função para consultar o voto com o código pessoal
 export const consultarVoto = async (codigoPessoal: string) => {
     try {
         const contrato = await getVotoContract();
@@ -101,14 +98,11 @@ export const consultarVoto = async (codigoPessoal: string) => {
     }
 };
 
-// Função para obter a quantidade de votos de um candidato
 export const obterVotosPorCandidato = async (candidatoId: number) => {
     try {
         const contrato = await getVotoContract();
 
-        // Chamada à função para obter votos por candidato
         const votos = await contrato.obterVotosPorCandidato(candidatoId);
-        console.log(`Votos para o candidato ${candidatoId}:`, votos);  // Verificando a resposta
 
         return votos;
     } catch (error) {
@@ -117,12 +111,10 @@ export const obterVotosPorCandidato = async (candidatoId: number) => {
     }
 };
 
-// Função para obter o total de votos
 export const obterTotalVotos = async () => {
     try {
         const contrato = await getVotoContract();
 
-        // Chamada à função para obter o total de votos
         const totalVotos = await contrato.obterTotalVotos();
 
         return totalVotos;

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
-import { getVotoContract, obterVotosPorCandidato } from "./contracts/votoContractV2";
+import { getVotoContract, obterVotosPorCandidato, obterTotalVotos } from "./contracts/votoContractV2";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 
 const IP = "192.168.1.170";
 
@@ -13,24 +16,62 @@ export default function Voto() {
   const [votacaoTerminada] = useState(true);
   const [showVote, setShowVote] = useState(false);
   const [firstTime, setFirstTime] = useState(true);
-  const [resultados, setResultados] = useState<{ votos: number; id: number; partido: string; cor: string }[]>([]);
-
-  const candidatos = [
-    { id: 1, partido: "Frelimo", cor: "#00C853" },
-    { id: 2, partido: "Renamo", cor: "#2962FF" },
-    { id: 3, partido: "MDM", cor: "#6A1B9A" },
-    { id: 4, partido: "ND", cor: "#FFD600" },
-    { id: 5, partido: "CMS", cor: "#FFAB00" },
-    { id: 6, partido: "CMD", cor: "#D50000" },
-  ];
+  const [resultados, setResultados] = useState<{ votos: number; id: number; partido: string; cor: string; percentagem: number }[]>([]);
+  const [user, setUser] = useState({ role: "" });
 
   useEffect(() => {
+
+    const fetchUser = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+
+        const response = await fetch(`http://${IP}:5000/auth/perfil`, {
+          method: "GET",
+          headers: { "Authorization": `Bearer ${token}` },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setUser(data);
+        } else {
+          alert("Erro ao carregar perfil");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar perfil:", error);
+      }
+    };
+
     const carregarResultados = async () => {
       try {
+        const res = await fetch(`http://${IP}:5000/candidates`);
+        const candidatos = await res.json();
+
+        const totalVotos = await obterTotalVotos();
+
+        const map: Record<string, number> = {};
+        candidatos.forEach((candidato: any, index: number) => {
+          map[candidato._id] = index + 1;
+        });
+
         const resultadosVotacao = await Promise.all(
-          candidatos.map(async (candidato) => {
-            const votos = await obterVotosPorCandidato(candidato.id);
-            return { ...candidato, votos };
+          candidatos.map(async (candidato: any) => {
+            const candidatoId = map[candidato._id];
+            let votos = 0;
+
+            try {
+              votos = await obterVotosPorCandidato(candidatoId);
+            } catch (err) {
+              console.error(`Erro ao obter votos para candidato ${candidatoId}:`, err);
+            }
+
+            return {
+              id: candidatoId,
+              partido: candidato.partido,
+              cor: candidato.cor,
+              votos,
+              percentagem: totalVotos ? (votos / totalVotos) * 100 : 0,
+            };
           })
         );
 
@@ -132,33 +173,72 @@ export default function Voto() {
             </View>
           </View>
 
-          {votacaoTerminada ? (
-            resultados.map((item, index) => (
-              <View key={index} style={styles.resultContainer}>
-                <Text style={styles.partidoText}>
-                  {item.partido} - {((item.votos / 10000000) * 100).toFixed(2)}%
+          {/* Renderização dos resultados para usuários */}
+          {user && user.role === "User" && (
+            <View>
+              {resultados.length > 0 ? (
+                resultados.map((item, index) => (
+                  <View key={index} style={styles.resultContainer}>
+                    <Text style={styles.partidoText}>
+                      {item.partido} - {item.percentagem.toFixed(2)}%
+                    </Text>
+                    <View style={styles.progressBarBackground}>
+                      <View
+                        style={{
+                          ...styles.progressBarFill,
+                          width: `${item.percentagem}%`,
+                          backgroundColor: item.cor,
+                        }}
+                      />
+                    </View>
+                    <Text style={styles.votosText}>Votos: {item.votos.toLocaleString()}</Text>
+                  </View>
+                ))
+              ) : (
+                <Text style={styles.waitingText}>
+                  A votação ainda está a decorrer, mas podes consultar os resultados parciais.
                 </Text>
-                <View style={styles.progressBarBackground}>
-                  <View
-                    style={{
-                      ...styles.progressBarFill,
-                      width: (item.votos / 10000000) * 100,
-                      backgroundColor: item.cor,
-                    }}
-                  />
-                </View>
-                <Text style={styles.votosText}>Votos: {item.votos.toLocaleString()}</Text>
-              </View>
-            ))
-          ) : (
-            <Text style={styles.waitingText}>
-              Os resultados estarão disponíveis após o encerramento da votação.
-            </Text>
+              )}
+            </View>
+          )}
+
+          {/* Renderização dos resultados para administradores */}
+          {user && user.role === "Admin" && (
+            <View>
+              {votacaoTerminada ? (
+                resultados.length > 0 ? (
+                  resultados.map((item, index) => (
+                    <View key={index} style={styles.resultContainer}>
+                      <Text style={styles.partidoText}>
+                        {item.partido} - {item.percentagem.toFixed(2)}%
+                      </Text>
+                      <View style={styles.progressBarBackground}>
+                        <View
+                          style={{
+                            ...styles.progressBarFill,
+                            width: `${item.percentagem}%`,
+                            backgroundColor: item.cor,
+                          }}
+                        />
+                      </View>
+                      <Text style={styles.votosText}>Votos: {item.votos.toLocaleString()}</Text>
+                    </View>
+                  ))
+                ) : (
+                  <Text style={styles.waitingText}>Nenhum resultado encontrado.</Text>
+                )
+              ) : (
+                <Text style={styles.waitingText}>
+                  Os resultados estarão disponíveis após o encerramento da votação.
+                </Text>
+              )}
+            </View>
           )}
         </>
       )}
     </ScrollView>
   );
+
 }
 
 const styles = StyleSheet.create({

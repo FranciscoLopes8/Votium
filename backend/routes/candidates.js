@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
 
 // POST - adicionar candidato
 router.post('/', upload.single('imagem'), async (req, res) => {
-  const { nome, partido, nascimento, naturalidade, biografia } = req.body;
+  const { nome, partido, nascimento, naturalidade, biografia, cor } = req.body;
 
   if (!req.file) {
     return res.status(400).json({ message: "Imagem é obrigatória" });
@@ -30,6 +30,7 @@ router.post('/', upload.single('imagem'), async (req, res) => {
     naturalidade,
     biografia,
     imagem: imagePath,
+    cor,
   });
 
   try {

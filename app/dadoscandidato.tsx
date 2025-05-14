@@ -1,5 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +27,7 @@ export default function DadosCandidato() {
   const [biografia, setBiografia] = useState("");
   const [plano, setPlano] = useState("");
   const [foto, setFoto] = useState<string | null>(null);
+  const [cor, setCor] = useState("");
 
   const escolherFoto = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -30,8 +41,24 @@ export default function DadosCandidato() {
     }
   };
 
+  const nomeParaCorHex = (nome: string) => {
+    const cores: { [key: string]: string } = {
+      verde: "#4CAF50",
+      vermelho: "#F44336",
+      azul: "#2196F3",
+      amarelo: "#FFEB3B",
+      roxo: "#9C27B0",
+      laranja: "#FF9800",
+      preto: "#000000",
+      branco: "#FFFFFF",
+      cinzento: "#9E9E9E",
+    };
+
+    return cores[nome.toLowerCase()] || nome;
+  };
+
   const guardarCandidato = async () => {
-    if (!nome || !partido || !nascimento || !naturalidade || !biografia || !plano || !foto) {
+    if (!nome || !partido || !nascimento || !naturalidade || !biografia || !plano || !foto || !cor) {
       alert("Por favor, preencha todos os campos.");
       return;
     }
@@ -43,6 +70,7 @@ export default function DadosCandidato() {
     formData.append("naturalidade", naturalidade);
     formData.append("biografia", biografia);
     formData.append("plano", plano);
+    formData.append("cor", nomeParaCorHex(cor));
 
     if (foto) {
       const fotoUri = foto;
@@ -56,7 +84,7 @@ export default function DadosCandidato() {
     }
 
     try {
-      const response = await fetch(`http://${IP}5000/candidates`, {
+      const response = await fetch(`http://${IP}:5000/candidates`, {
         method: "POST",
         body: formData,
       });
@@ -66,7 +94,7 @@ export default function DadosCandidato() {
         router.push("/Campanha");
         navigation.goBack();
       } else {
-        alert("Erro ao guardar o candidato.");
+        alert("Erro ao guardar o candidato");
       }
     } catch (error) {
       console.error("Erro na requisição:", error);
@@ -164,6 +192,33 @@ export default function DadosCandidato() {
             numberOfLines={4}
           />
         </View>
+
+        {/* Cor */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Cor do Partido"
+            value={cor}
+            onChangeText={setCor}
+            placeholderTextColor="#aaa"
+          />
+        </View>
+
+        {/* Pré-visualização da cor */}
+        {cor.length > 0 && (
+          <View
+            style={{
+              backgroundColor: nomeParaCorHex(cor),
+              width: 50,
+              height: 50,
+              borderRadius: 10,
+              alignSelf: "center",
+              marginBottom: 15,
+              borderWidth: 1,
+              borderColor: "#ccc",
+            }}
+          />
+        )}
 
         {/* Botão Guardar */}
         <TouchableOpacity style={styles.button} onPress={guardarCandidato}>
