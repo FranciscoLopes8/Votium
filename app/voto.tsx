@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, ActivityIndicator, Image } from "react-native";
 import { getVotoContract, obterVotosPorCandidato, obterTotalVotos } from "./contracts/votoContractV2";
-import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const IP = "192.168.1.183";
+const IP = "192.168.1.170";
 
 export default function Voto() {
   const [codigoPessoal, setCodigoPessoal] = useState("");
   const [candidatoNome, setCandidatoNome] = useState<string | null>(null);
+  const [candidato, setCandidato] = useState<any>(null);
   const [carregando, setCarregando] = useState(false);
-  const [votacaoTerminada] = useState(true);
+  const [candidatoCorrespondente, setCandidatoCorrespondente] = useState<any>(null);
+  const [votacaoTerminada, setvotacaoTerminada] = useState(false);
   const [showVote, setShowVote] = useState(false);
   const [firstTime, setFirstTime] = useState(true);
   const [resultados, setResultados] = useState<{ votos: number; id: number; partido: string; cor: string; percentagem: number }[]>([]);
@@ -80,23 +81,36 @@ export default function Voto() {
       }
     };
 
-    if (votacaoTerminada) {
-      carregarResultados();
-    }
-  }, [votacaoTerminada]);
+    const verificarEleicao = async () => {
+      const resultado = await AsyncStorage.getItem("votacaoTerminada");
+      const terminou = resultado === "true";
+      setvotacaoTerminada(terminou);
+
+      if (terminou) {
+        carregarResultados();
+      }
+    };
+
+    verificarEleicao();
+  }, []);
 
   const buscarCandidato = async (id: number) => {
     try {
       const res = await fetch(`http://${IP}:5000/candidates`);
       const data = await res.json();
 
-      const map: Record<number, string> = {};
+      const map: Record<number, any> = {};
       data.forEach((c: any, index: number) => {
-        map[index + 1] = c.nome;
+        map[index + 1] = c;
       });
+      const cand = map[id];
 
-      if (map[id]) setCandidatoNome(map[id]);
-      else setCandidatoNome("Desconhecido");
+      if (cand) {
+        setCandidato(cand);
+        setCandidatoNome(cand.nome);
+      } else {
+        setCandidatoNome("Desconhecido");
+      }
     } catch (e) {
       console.log("Erro ao buscar candidato:", e);
       setCandidatoNome("Erro");
@@ -160,30 +174,69 @@ export default function Voto() {
         </View>
       ) : (
         <>
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>O teu voto foi em:</Text>
-            <View style={styles.voteRow}>
-              <Text style={styles.headerCandidato}>
-                {showVote ? candidatoNome : "Confidencial"}
-              </Text>
-              <TouchableOpacity onPress={() => setShowVote(!showVote)} style={styles.eyeIcon}>
-                <Ionicons name={showVote ? "eye-off" : "eye"} size={22} color="white" />
-              </TouchableOpacity>
-            </View>
-          </View>
           {user.role === "User" && (
-            <View>
-              <Text>
-
-              </Text>
-            </View>
+            <>
+              {!votacaoTerminada ? (
+                <>
+                  <View style={styles.header}>
+                    <Text style={styles.headerTitle}>O teu voto foi em:</Text>
+                  </View>
+                  <View style={styles.candidateCard}>
+                    <Image
+                      source={
+                        candidato.imagem?.startsWith("/")
+                          ? { uri: `http://${IP}:5000${candidato.imagem}` }
+                          : require("../assets/images/icon.png")
+                      }
+                      style={styles.candidateImage}
+                    />
+                    <Text style={styles.candidateName}>{candidato.nome}</Text>
+                  </View>
+                  <Text style={styles.candidatoBiografia}>
+                    {candidato.biografia}
+                  </Text>
+                </>
+              ) : <>
+                <View style={styles.header}>
+                  <Text style={styles.headerTitle}>Painel de Resultados</Text>
+                </View>
+                <View>
+                  {resultados.length > 0 ? (
+                    resultados.map((item, index) => (
+                      <View key={index} style={styles.resultContainer}>
+                        <Text style={styles.partidoText}>
+                          {item.partido} - {item.percentagem.toFixed(2)}%
+                        </Text>
+                        <View style={styles.progressBarBackground}>
+                          <View
+                            style={{
+                              ...styles.progressBarFill,
+                              width: `${item.percentagem}%`,
+                              backgroundColor: item.cor,
+                            }}
+                          />
+                        </View>
+                        <Text style={styles.votosText}>
+                          Votos: {item.votos.toLocaleString()}
+                        </Text>
+                      </View>
+                    ))
+                  ) : (
+                    <Text style={styles.waitingText}>Nenhum resultado encontrado.</Text>
+                  )}
+                </View>
+              </>}
+            </>
           )}
 
           {/* Renderização dos resultados para administradores */}
           {user.role === "Admin" && (
-            <View>
-              {votacaoTerminada ? (
-                resultados.length > 0 ? (
+            <>
+              <View style={styles.header}>
+                <Text style={styles.headerTitle}>Painel de Resultados</Text>
+              </View>
+              <View>
+                {resultados.length > 0 ? (
                   resultados.map((item, index) => (
                     <View key={index} style={styles.resultContainer}>
                       <Text style={styles.partidoText}>
@@ -198,22 +251,22 @@ export default function Voto() {
                           }}
                         />
                       </View>
-                      <Text style={styles.votosText}>Votos: {item.votos.toLocaleString()}</Text>
+                      <Text style={styles.votosText}>
+                        Votos: {item.votos.toLocaleString()}
+                      </Text>
                     </View>
                   ))
                 ) : (
                   <Text style={styles.waitingText}>Nenhum resultado encontrado.</Text>
-                )
-              ) : (
-                <Text style={styles.waitingText}>
-                  Os resultados estarão disponíveis após o encerramento da votação.
-                </Text>
-              )}
-            </View>
+                )}
+              </View>
+            </>
           )}
         </>
+
       )}
     </ScrollView>
+
   );
 
 }
@@ -279,8 +332,9 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: "#fff",
-    fontSize: 16,
-    fontWeight: "600"
+    fontSize: 32,
+    textAlign: "center",
+    fontWeight: "bold",
   },
   headerCandidato: {
     color: "#fff",
@@ -320,9 +374,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#555"
   },
-  candidatoImage: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
+  candidateImage: { width: 200, height: 200, borderRadius: 30, alignSelf: "center" },
+  candidateCard: {
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
+    elevation: 2,
+    width: "90%",
+    minHeight: 80,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    alignSelf: "center"
   },
+  candidateName: { fontSize: 24, fontWeight: "bold", alignSelf: "center", padding: 20 },
+  candidatoBiografia: { fontSize: 18, padding: 20 },
 });

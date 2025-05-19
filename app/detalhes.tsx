@@ -4,7 +4,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getVotoContract } from "./contracts/votoContractV2"; 
 
-const IP = "192.168.1.183";
+const IP = "192.168.1.170";
 
 interface Candidato {
   _id: string;

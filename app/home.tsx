@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FlashList } from "@shopify/flash-list";
 import { Ionicons } from '@expo/vector-icons';
 
-const IP = "192.168.1.183";
+const IP = "192.168.1.170";
 
 interface Candidato {
   _id: string;
@@ -77,13 +77,19 @@ export default function Home() {
   }, []);
 
   const iniciarContagemRegressiva = (dataAlvo: Date) => {
-    setInterval(() => {
+    const intervalo = setInterval(async () => {
       const agora = new Date().getTime();
       const alvo = dataAlvo.getTime();
       const restante = alvo - agora;
 
       if (restante <= 0) {
+        clearInterval(intervalo);
         setTempoRestante({ dias: 0, horas: 0, minutos: 0, segundos: 0 });
+
+        await AsyncStorage.setItem("votacaoTerminada", "true");
+
+        console.log("tempo guardado");
+
         return;
       }
 

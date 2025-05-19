@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { router } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const IP = "192.168.1.183";
+const IP = "192.168.1.170";
 
 export default function CriarConta() {
   const navigation = useNavigation();

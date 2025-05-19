@@ -15,7 +15,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from '@expo/vector-icons';
 import { router } from "expo-router";
 
-const IP = "192.168.1.183";
+const IP = "192.168.1.170";
 
 export default function DadosCandidato() {
   const navigation = useNavigation();

@@ -5,7 +5,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const IP = "192.168.1.183";
+const IP = "192.168.1.170";
 
 export default function EditarPerfil() {
   const router = useRouter();
