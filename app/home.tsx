@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FlashList } from "@shopify/flash-list";
 import { Ionicons } from '@expo/vector-icons';
 
-const IP = "192.168.1.170";
+const IP = "192.168.1.183";
 
 interface Candidato {
   _id: string;

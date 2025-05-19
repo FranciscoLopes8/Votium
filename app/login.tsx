@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 
-const IP = "192.168.1.170";
+const IP = "192.168.1.183";
 
 export default function Index() {
   const [telefone, setTelefone] = useState("");

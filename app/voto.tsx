@@ -4,10 +4,7 @@ import { getVotoContract, obterVotosPorCandidato, obterTotalVotos } from "./cont
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-
-const IP = "192.168.1.170";
-
+const IP = "192.168.1.183";
 
 export default function Voto() {
   const [codigoPessoal, setCodigoPessoal] = useState("");
@@ -53,6 +50,8 @@ export default function Voto() {
         candidatos.forEach((candidato: any, index: number) => {
           map[candidato._id] = index + 1;
         });
+
+        fetchUser();
 
         const resultadosVotacao = await Promise.all(
           candidatos.map(async (candidato: any) => {
@@ -172,38 +171,16 @@ export default function Voto() {
               </TouchableOpacity>
             </View>
           </View>
-
-          {/* Renderização dos resultados para usuários */}
-          {user && user.role === "User" && (
+          {user.role === "User" && (
             <View>
-              {resultados.length > 0 ? (
-                resultados.map((item, index) => (
-                  <View key={index} style={styles.resultContainer}>
-                    <Text style={styles.partidoText}>
-                      {item.partido} - {item.percentagem.toFixed(2)}%
-                    </Text>
-                    <View style={styles.progressBarBackground}>
-                      <View
-                        style={{
-                          ...styles.progressBarFill,
-                          width: `${item.percentagem}%`,
-                          backgroundColor: item.cor,
-                        }}
-                      />
-                    </View>
-                    <Text style={styles.votosText}>Votos: {item.votos.toLocaleString()}</Text>
-                  </View>
-                ))
-              ) : (
-                <Text style={styles.waitingText}>
-                  A votação ainda está a decorrer, mas podes consultar os resultados parciais.
-                </Text>
-              )}
+              <Text>
+
+              </Text>
             </View>
           )}
 
           {/* Renderização dos resultados para administradores */}
-          {user && user.role === "Admin" && (
+          {user.role === "Admin" && (
             <View>
               {votacaoTerminada ? (
                 resultados.length > 0 ? (
@@ -342,5 +319,10 @@ const styles = StyleSheet.create({
   votosText: {
     fontSize: 14,
     color: "#555"
+  },
+  candidatoImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
 });

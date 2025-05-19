@@ -5,7 +5,7 @@ import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Swipeable } from 'react-native-gesture-handler';
 
-const IP = "192.168.1.170";
+const IP = "192.168.1.183";
 
 interface Candidato {
   _id: string;
