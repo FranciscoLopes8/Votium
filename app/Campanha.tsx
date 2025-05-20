@@ -114,7 +114,12 @@ export default function Campanha() {
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
             <Swipeable
-              renderLeftActions={() => null}
+              renderLeftActions={() => (<TouchableOpacity style={styles.editButton} onPress={async () => {
+                await AsyncStorage.setItem("candidatoSelecionado", JSON.stringify(item));
+                router.push("/editarCandidato");
+              }}>
+                <Text style={styles.deleteText}>Editar</Text>
+              </TouchableOpacity>)}
               renderRightActions={() => (
                 <TouchableOpacity style={styles.deleteButton} onPress={() => excluirCandidato(item._id)}>
                   <Text style={styles.deleteText}>Excluir</Text>
@@ -207,6 +212,15 @@ const styles = StyleSheet.create({
   addText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
   deleteButton: {
     backgroundColor: "#FF0000",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 80,
+    height: 40,
+    marginVertical: 10,
+    borderRadius: 10,
+  },
+  editButton: {
+    backgroundColor: "#4B2AFA",
     justifyContent: "center",
     alignItems: "center",
     width: 80,

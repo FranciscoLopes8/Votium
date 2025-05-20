@@ -36,7 +36,7 @@ app.use("/auth", require("./routes/authPerfil.js"));
 app.use("/candidates", require("./routes/candidates.js"));
 app.use('/uploads', express.static('uploads'));
 app.use("/perfil", require("./routes/editProfile.js"));
-
+app.use("/candidatoperfil", require("./routes/editCandidate.js"));
 
 
 app.post('/upload', upload.single('imagem'), (req, res) => {

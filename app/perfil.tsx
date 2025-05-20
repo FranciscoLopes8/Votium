@@ -45,11 +45,14 @@ export default function Profile() {
   return (
     <View style={styles.container}>
       {/* Perfil */}
-      <Image source={
-        user.imagem?.startsWith("/")
-          ? { uri: `http://${IP}:5000${user.imagem}` }
-          : require("../assets/images/icon.png")
-      } style={styles.profilePic} />
+      <Image
+        source={
+          user.imagem?.startsWith("/")
+            ? { uri: `http://${IP}:5000${user.imagem}` }
+            : require("../assets/images/icon.png")
+        }
+        style={styles.profilePic}
+      />
       <Text style={styles.name}>{user.primeiroNome} {user.ultimoNome}</Text>
       <Text style={styles.role}>{user.role}</Text>
       <TouchableOpacity style={styles.editButton} onPress={() => router.push("/editar")}>

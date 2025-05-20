@@ -88,8 +88,6 @@ export default function Home() {
 
         await AsyncStorage.setItem("votacaoTerminada", "true");
 
-        console.log("tempo guardado");
-
         return;
       }
 
@@ -115,7 +113,9 @@ export default function Home() {
             user.imagem?.startsWith("/")
               ? { uri: `http://${IP}:5000${user.imagem}` }
               : require("../assets/images/icon.png")
-          } style={styles.profilePic} />
+          }
+            style={styles.profilePic}
+          />
         </TouchableOpacity>
         <Text style={styles.name}>{user.primeiroNome}</Text>
         {user.role === "Admin" && (
@@ -174,7 +174,7 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", paddingTop: 50 },
+  container: { flex: 1, backgroundColor: "#fff" },
   profileHeader: { flexDirection: "row", alignItems: "center", width: "100%", paddingHorizontal: 20, marginBottom: 20 },
   profilePic: { width: 50, height: 50, borderRadius: 25 },
   name: { fontSize: 22, fontWeight: "bold", marginLeft: 10 },
