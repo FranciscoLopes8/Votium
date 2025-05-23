@@ -3,8 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, ActivityIndicat
 import { router, useLocalSearchParams } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getVotoContract } from "./contracts/votoContractV2"; 
-
-const IP = "192.168.1.170";
+import { IP } from "../config";
 
 interface Candidato {
   _id: string;
@@ -14,6 +13,7 @@ interface Candidato {
   naturalidade: string;
   biografia: string;
   imagem: string | null;
+  planoEleitoral: string;
 }
 
 export default function CandidateDetails() {
@@ -23,6 +23,7 @@ export default function CandidateDetails() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState({ telefone: "", codigoPessoal: "" });
   const [candidatoIdMap, setCandidatoIdMap] = useState<Record<string, number>>({});
+  const [activeTab, setActiveTab] = useState<'Profile' | 'Campaign'>('Profile');
 
   useEffect(() => {
     const fetchCandidate = async () => {
@@ -34,15 +35,15 @@ export default function CandidateDetails() {
 
       try {
         const response = await fetch(`http://${IP}:5000/candidates`);
-
         const contentType = response.headers.get("content-type");
-        if (!response.ok || !contentType || !contentType.includes("application/json")) {
+        
+        if (!response.ok || !contentType?.includes("application/json")) {
           throw new Error("Resposta inválida da API");
         }
 
         const data: Candidato[] = await response.json();
-
         const map: Record<string, number> = {};
+
         data.forEach((c, index) => {
           map[c._id] = index + 1;
         });
@@ -110,7 +111,6 @@ export default function CandidateDetails() {
         <Text style={styles.backText}>{"<"}</Text>
       </TouchableOpacity>
 
-      {/* Imagem do Candidato */}
       <Image
         source={candidato.imagem?.startsWith("/")
           ? { uri: `http://${IP}:5000${candidato.imagem}` }
@@ -120,30 +120,48 @@ export default function CandidateDetails() {
       <Text style={styles.name}>{candidato.nome}</Text>
       <Text style={styles.party}>{candidato.partido}</Text>
 
-      {/* Botão de Votação */}
       <TouchableOpacity style={styles.voteButton} onPress={() => setModalVisible(true)}>
         <Text style={styles.voteText}>Vote now</Text>
       </TouchableOpacity>
 
-      {/* Tabs de Informação */}
+      {/* Tabs Section */}
       <View style={styles.tabs}>
-        <Text style={styles.activeTab}>Profile</Text>
-        <Text style={styles.inactiveTab}>Campaign</Text>
+        <TouchableOpacity onPress={() => setActiveTab('Profile')}>
+          <Text style={activeTab === 'Profile' ? styles.activeTab : styles.inactiveTab}>
+            Profile
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setActiveTab('Campaign')} style={{ marginLeft: 20 }}>
+          <Text style={activeTab === 'Campaign' ? styles.activeTab : styles.inactiveTab}>
+            Campaign
+          </Text>
+        </TouchableOpacity>
       </View>
 
-      {/* Informações do candidato */}
+      {/* Content Section */}
       <View style={styles.infoContainer}>
-        <Text style={styles.label}>Nascimento:</Text>
-        <Text style={styles.text}>{candidato.nascimento}</Text>
+        {activeTab === 'Profile' ? (
+          <>
+            <Text style={styles.label}>Nascimento:</Text>
+            <Text style={styles.text}>{candidato.nascimento}</Text>
 
-        <Text style={styles.label}>Naturalidade:</Text>
-        <Text style={styles.text}>{candidato.naturalidade}</Text>
+            <Text style={styles.label}>Naturalidade:</Text>
+            <Text style={styles.text}>{candidato.naturalidade}</Text>
 
-        <Text style={styles.label}>Biografia:</Text>
-        <Text style={styles.text}>{candidato.biografia}</Text>
+            <Text style={styles.label}>Biografia:</Text>
+            <Text style={styles.text}>{candidato.biografia}</Text>
+          </>
+        ) : (
+          <>
+            <Text style={styles.label}>Plano Eleitoral:</Text>
+            <Text style={styles.text}>
+              {candidato.planoEleitoral || "No electoral plan available"}
+            </Text>
+          </>
+        )}
       </View>
 
-      {/* Modal de Confirmação */}
+      {/* Voting Modal */}
       <Modal animationType="none" transparent={true} visible={modalVisible}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -159,9 +177,9 @@ export default function CandidateDetails() {
                 style={styles.confirmButton}
                 onPress={async () => {
                   try {
-                    const contrato = await getVotoContract(); // Atualizado para usar o novo contrato
-
+                    const contrato = await getVotoContract();
                     const contractId = candidatoIdMap[id as string];
+
                     if (!contractId) {
                       alert("ID do candidato inválido para votação.");
                       return;
@@ -214,14 +232,27 @@ const styles = StyleSheet.create({
   party: { fontSize: 16, color: "#777", marginBottom: 20 },
   voteButton: { backgroundColor: "#4B2AFA", padding: 15, borderRadius: 10, alignItems: "center", marginBottom: 20 },
   voteText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
-  tabs: { flexDirection: "row", marginBottom: 10 },
-  activeTab: { fontWeight: "bold", color: "#4B2AFA", marginRight: 20, borderBottomWidth: 2, borderBottomColor: "#6C63FF" },
-  inactiveTab: { color: "#777" },
+  tabs: { 
+    flexDirection: "row", 
+    marginBottom: 10,
+    paddingHorizontal: 10,
+  },
+  activeTab: { 
+    fontWeight: "bold", 
+    color: "#4B2AFA", 
+    paddingBottom: 5,
+    borderBottomWidth: 2, 
+    borderBottomColor: "#6C63FF" 
+  },
+  inactiveTab: { 
+    color: "#777",
+    paddingBottom: 5,
+  },
   infoContainer: { marginTop: 10 },
   label: { fontSize: 14, fontWeight: "bold", marginTop: 10 },
   text: { fontSize: 14, color: "#777" },
 
-  // Estilos do Modal
+  // Modal styles
   modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
   modalContent: { width: "80%", backgroundColor: "#fff", padding: 20, borderRadius: 10, alignItems: "center" },
   modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },

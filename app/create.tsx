@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { router } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const IP = "192.168.1.170";
+import { IP } from "../config";
 
 export default function CriarConta() {
   const navigation = useNavigation();
@@ -17,6 +17,19 @@ export default function CriarConta() {
   const [user, setUser] = useState({ primeiroNome: "", ultimoNome: "", role: "", codigoPessoal: "" });
 
   const handleCriarConta = async () => {
+    const telefoneValido = /^\d{9}$/.test(telefone);
+    const senhaValida = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/.test(senha);
+
+    if (!telefoneValido) {
+      alert("O número de telefone deve conter exatamente 9 dígitos.");
+      return;
+    }
+
+    if (!senhaValida) {
+      alert("A palavra-passe deve ter pelo menos 8 caracteres, incluindo letras maiúsculas, minúsculas, números e símbolos.");
+      return;
+    }
+
     if (senha !== confirmarSenha) {
       alert("As senhas não coincidem!");
       return;
@@ -32,7 +45,6 @@ export default function CriarConta() {
       const data = await response.json();
 
       if (response.ok) {
-
         await AsyncStorage.setItem("token", data.token);
         router.push("/verification");
       } else {

@@ -7,7 +7,8 @@ const candidateSchema = new mongoose.Schema({
   naturalidade: { type: String, required: true },
   biografia: { type: String, required: true },
   imagem: { type: String, required: true },
-  cor: { type: String, required: true }
+  cor: { type: String, required: true },
+  planoEleitoral: { type: String, required: true } // <-- novo campo
 });
 
 module.exports = mongoose.model('Candidate', candidateSchema);

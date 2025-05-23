@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Activi
 import { getVotoContract, obterVotosPorCandidato, obterTotalVotos } from "./contracts/votoContractV2";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const IP = "192.168.1.170";
+import { IP } from "../config";
 
 export default function Voto() {
   const [codigoPessoal, setCodigoPessoal] = useState("");

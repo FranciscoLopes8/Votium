@@ -15,7 +15,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from '@expo/vector-icons';
 import { router } from "expo-router";
 
-const IP = "192.168.1.170";
+import { IP } from "../config";
 
 export default function DadosCandidato() {
   const navigation = useNavigation();
@@ -27,7 +27,19 @@ export default function DadosCandidato() {
   const [biografia, setBiografia] = useState("");
   const [plano, setPlano] = useState("");
   const [foto, setFoto] = useState<string | null>(null);
-  const [cor, setCor] = useState("");
+  const [cor, setCor] = useState<string>("");
+
+  // Paleta de cores visual
+  const coresPaleta: { nome: string; hex: string }[] = [
+    { nome: "Verde", hex: "#4CAF50" },
+    { nome: "Vermelho", hex: "#F44336" },
+    { nome: "Azul", hex: "#2196F3" },
+    { nome: "Amarelo", hex: "#FFEB3B" },
+    { nome: "Roxo", hex: "#9C27B0" },
+    { nome: "Laranja", hex: "#FF9800" },
+    { nome: "Preto", hex: "#000000" },
+    { nome: "Cinza", hex: "#9E9E9E" },
+  ];
 
   const escolherFoto = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -39,22 +51,6 @@ export default function DadosCandidato() {
     if (!result.canceled) {
       setFoto(result.assets[0].uri);
     }
-  };
-
-  const nomeParaCorHex = (nome: string) => {
-    const cores: { [key: string]: string } = {
-      verde: "#4CAF50",
-      vermelho: "#F44336",
-      azul: "#2196F3",
-      amarelo: "#FFEB3B",
-      roxo: "#9C27B0",
-      laranja: "#FF9800",
-      preto: "#000000",
-      branco: "#FFFFFF",
-      cinzento: "#9E9E9E",
-    };
-
-    return cores[nome.toLowerCase()] || nome;
   };
 
   const guardarCandidato = async () => {
@@ -69,8 +65,8 @@ export default function DadosCandidato() {
     formData.append("nascimento", nascimento);
     formData.append("naturalidade", naturalidade);
     formData.append("biografia", biografia);
-    formData.append("plano", plano);
-    formData.append("cor", nomeParaCorHex(cor));
+    formData.append("planoEleitoral", plano);
+    formData.append("cor", cor);
 
     if (foto) {
       const fotoUri = foto;
@@ -104,65 +100,40 @@ export default function DadosCandidato() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={[styles.container, { backgroundColor: "#fff" }]}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={{ paddingBottom: 50 }} keyboardShouldPersistTaps="handled">
         {/* Botão Voltar */}
         <TouchableOpacity onPress={() => router.push("/Campanha")} style={styles.backButton}>
-          <Text style={styles.backText}>{"<"}</Text>
+          <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
 
-        {/* Título */}
-        <Text style={styles.title}>Dados do Candidato</Text>
+        {/* Título com cor do partido */}
+        <Text style={[styles.title, { color: cor || "#4B2AFA" }]}>Dados do Candidato</Text>
 
-        {/* Nome */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Nome do candidato"
-            value={nome}
-            onChangeText={setNome}
-            placeholderTextColor="#aaa"
-          />
-        </View>
+        {/* Campos */}
+        {[
+          { label: "Nome do candidato", value: nome, setter: setNome },
+          { label: "Partido", value: partido, setter: setPartido },
+          { label: "País de nascimento", value: nascimento, setter: setNascimento },
+          { label: "Naturalidade", value: naturalidade, setter: setNaturalidade },
+        ].map(({ label, value, setter }) => (
+          <View key={label} style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder={label}
+              value={value}
+              onChangeText={setter}
+              placeholderTextColor="#999"
+              underlineColorAndroid="transparent"
+            />
+          </View>
+        ))}
 
-        {/* Partido */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Partido"
-            value={partido}
-            onChangeText={setPartido}
-            placeholderTextColor="#aaa"
-          />
-        </View>
-
-        {/* Nascimento */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="País de nascimento"
-            value={nascimento}
-            onChangeText={setNascimento}
-            placeholderTextColor="#aaa"
-          />
-        </View>
-
-        {/* Naturalidade */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Naturalidade"
-            value={naturalidade}
-            onChangeText={setNaturalidade}
-            placeholderTextColor="#aaa"
-          />
-        </View>
-
-        {/* Botão de Foto */}
+        {/* Foto */}
         <TouchableOpacity style={styles.fotoButton} onPress={escolherFoto}>
-          <Ionicons name="camera" size={30} color="#333" />
+          <Ionicons name="camera" size={28} color="#555" />
           <Text style={styles.fotoText}>Escolher fotografia</Text>
         </TouchableOpacity>
         {foto && <Image source={{ uri: foto }} style={styles.fotoPreview} />}
@@ -174,54 +145,56 @@ export default function DadosCandidato() {
             placeholder="Biografia do candidato..."
             value={biografia}
             onChangeText={setBiografia}
-            placeholderTextColor="#aaa"
+            placeholderTextColor="#999"
             multiline
             numberOfLines={4}
           />
         </View>
 
-        {/* Plano de Campanha */}
+        {/* Plano */}
         <View style={styles.inputContainer}>
           <TextInput
             style={[styles.input, styles.textArea]}
             placeholder="Plano de campanha..."
             value={plano}
             onChangeText={setPlano}
-            placeholderTextColor="#aaa"
+            placeholderTextColor="#999"
             multiline
             numberOfLines={4}
           />
         </View>
 
-        {/* Cor */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Cor do Partido"
-            value={cor}
-            onChangeText={setCor}
-            placeholderTextColor="#aaa"
-          />
+        {/* Paleta de cores - remover input texto de cor */}
+        <Text style={styles.label}>Escolha a cor do Partido</Text>
+        <View style={styles.paletaContainer}>
+          {coresPaleta.map(({ nome, hex }) => (
+            <TouchableOpacity
+              key={nome}
+              style={[
+                styles.colorCircle,
+                { backgroundColor: hex },
+                cor === hex && styles.colorCircleSelected,
+              ]}
+              onPress={() => setCor(hex)}
+              activeOpacity={0.7}
+            />
+          ))}
         </View>
 
-        {/* Pré-visualização da cor */}
-        {cor.length > 0 && (
-          <View
-            style={{
-              backgroundColor: nomeParaCorHex(cor),
-              width: 50,
-              height: 50,
-              borderRadius: 10,
-              alignSelf: "center",
-              marginBottom: 15,
-              borderWidth: 1,
-              borderColor: "#ccc",
-            }}
-          />
-        )}
+        {/* Cor selecionada */}
+        {cor ? (
+          <View style={styles.previewCorContainer}>
+            <Text style={{ marginRight: 10 }}>Cor selecionada:</Text>
+            <View style={[styles.colorCircle, { backgroundColor: cor }]} />
+          </View>
+        ) : null}
 
-        {/* Botão Guardar */}
-        <TouchableOpacity style={styles.button} onPress={guardarCandidato}>
+        {/* Botão Guardar com cor do partido */}
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: cor || "#4B2AFA" }]}
+          onPress={guardarCandidato}
+          activeOpacity={0.8}
+        >
           <Text style={styles.buttonText}>Guardar</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -231,10 +204,7 @@ export default function DadosCandidato() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    paddingTop: 60,
-    backgroundColor: "#fff",
-    paddingBottom: 80,
+    flex: 1,
   },
   backButton: {
     position: "absolute",
@@ -247,62 +217,109 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     zIndex: 10,
-  },
-  backText: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "bold",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
   },
   title: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: "bold",
-    marginBottom: 20,
-    marginTop: 30,
+    marginTop: 80,
+    marginBottom: 30,
     textAlign: "center",
   },
   inputContainer: {
-    width: "100%",
+    marginHorizontal: 20,
     marginBottom: 15,
   },
   input: {
-    width: "100%",
+    backgroundColor: "#F0F0F0",
+    borderRadius: 12,
     height: 50,
-    backgroundColor: "#F5F5F5",
-    borderRadius: 10,
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
+    fontSize: 16,
+    color: "#333",
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 3,
   },
   textArea: {
-    height: 100,
+    height: 110,
     textAlignVertical: "top",
+    paddingTop: 15,
   },
   fotoButton: {
-    backgroundColor: "#F5F5F5",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
+    backgroundColor: "#e1e1e1",
+    paddingVertical: 14,
+    borderRadius: 12,
     alignItems: "center",
-    flexDirection: "column",
+    flexDirection: "row",
+    justifyContent: "center",
+    marginHorizontal: 20,
+    marginBottom: 15,
+    gap: 10,
   },
   fotoText: {
-    color: "#333",
-    fontWeight: "500",
-    marginTop: 5,
+    color: "#555",
+    fontWeight: "600",
+    fontSize: 16,
   },
   fotoPreview: {
-    width: "100%",
-    height: 200,
-    marginBottom: 15,
-    borderRadius: 10,
-  },
-  button: {
-    backgroundColor: "#4B2AFA",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
+    width: "90%",
+    height: 220,
+    borderRadius: 15,
+    marginBottom: 25,
+marginHorizontal: "5%",
+borderWidth: 1,
+borderColor: "#ddd",
+},
+label: {
+fontSize: 16,
+fontWeight: "600",
+marginBottom: 10,
+marginHorizontal: 20,
+color: "#444",
+},
+paletaContainer: {
+flexDirection: "row",
+flexWrap: "wrap",
+gap: 15,
+marginBottom: 20,
+justifyContent: "center",
+marginHorizontal: 10,
+},
+colorCircle: {
+width: 38,
+height: 38,
+borderRadius: 19,
+borderWidth: 2,
+borderColor: "transparent",
+},
+colorCircleSelected: {
+borderColor: "#4B2AFA",
+borderWidth: 3,
+},
+previewCorContainer: {
+flexDirection: "row",
+alignItems: "center",
+justifyContent: "center",
+marginBottom: 30,
+},
+button: {
+paddingVertical: 16,
+borderRadius: 15,
+alignItems: "center",
+marginHorizontal: 20,
+shadowColor: "#4B2AFA",
+shadowOpacity: 0.5,
+shadowOffset: { width: 0, height: 5 },
+shadowRadius: 10,
+},
+buttonText: {
+color: "#fff",
+fontWeight: "700",
+fontSize: 18,
+},
 });
