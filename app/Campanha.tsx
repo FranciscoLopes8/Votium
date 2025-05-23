@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, Image } from
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { FlashList } from "@shopify/flash-list";
 import { Swipeable } from 'react-native-gesture-handler';
 
 import { IP } from "../config";
@@ -109,17 +110,21 @@ export default function Campanha() {
           </TouchableOpacity>
         </View>
 
-        <FlatList
+        <FlashList
           data={candidatos}
           keyExtractor={(item) => item._id}
+          estimatedItemSize={80}
+          contentContainerStyle={{ paddingBottom: 25 }}
           renderItem={({ item }) => (
             <Swipeable
-              renderLeftActions={() => (<TouchableOpacity style={styles.editButton} onPress={async () => {
-                await AsyncStorage.setItem("candidatoSelecionado", JSON.stringify(item));
-                router.push("/editarCandidato");
-              }}>
-                <Text style={styles.deleteText}>Editar</Text>
-              </TouchableOpacity>)}
+              renderLeftActions={() => (
+                <TouchableOpacity style={styles.editButton} onPress={async () => {
+                  await AsyncStorage.setItem("candidatoSelecionado", JSON.stringify(item));
+                  router.push("/editarCandidato");
+                }}>
+                  <Text style={styles.deleteText}>Editar</Text>
+                </TouchableOpacity>
+              )}
               renderRightActions={() => (
                 <TouchableOpacity style={styles.deleteButton} onPress={() => excluirCandidato(item._id)}>
                   <Text style={styles.deleteText}>Excluir</Text>
@@ -150,7 +155,11 @@ export default function Campanha() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 20 },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    padding: 20,
+  },
   backButton: {
     position: "absolute",
     top: 40,
@@ -182,6 +191,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     marginBottom: 20,
+    flex: 1,
   },
   headerRow: {
     flexDirection: "row",
