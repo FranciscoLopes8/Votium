@@ -3,13 +3,28 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Platform } from "react-native";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { useEffect } from "react";
 import "./globals.css";
 
 export default function RootLayout() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [selectedTab, setSelectedTab] = useState("home");
+  const [selectedTab, setSelectedTab] = useState(() => {
+
+    if (pathname.startsWith("/perfil") || pathname.startsWith("/editar") || pathname.startsWith("/about")) return "profile";
+    if (pathname.startsWith("/voto")) return "vote";
+    if (pathname.startsWith("/home")) return "home";
+    return "home";
+  });
+
+
+  useEffect(() => {
+    if (pathname.startsWith("/perfil") || pathname.startsWith("/editar") || pathname.startsWith("/about")) setSelectedTab("profile");
+    else if (pathname.startsWith("/voto")) setSelectedTab("vote");
+    else if (pathname.startsWith("/home")) setSelectedTab("home");
+    else setSelectedTab("home"); // fallback
+  }, [pathname]);
 
   if (pathname === "/login" || pathname === "/create" || pathname === "/" || pathname == "/onboarding") {
     return (
