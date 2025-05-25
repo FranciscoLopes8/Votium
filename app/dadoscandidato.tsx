@@ -9,6 +9,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Modal,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
@@ -28,8 +29,8 @@ export default function DadosCandidato() {
   const [plano, setPlano] = useState("");
   const [foto, setFoto] = useState<string | null>(null);
   const [cor, setCor] = useState<string>("");
+  const [modalVisible, setModalVisible] = useState(false);
 
-  // Paleta de cores visual
   const coresPaleta: { nome: string; hex: string }[] = [
     { nome: "Verde", hex: "#4CAF50" },
     { nome: "Vermelho", hex: "#F44336" },
@@ -76,8 +77,9 @@ export default function DadosCandidato() {
         uri: fotoUri,
         name: `foto.${fileType}`,
         type: `image/${fileType}`,
-      } as any);
+      } as unknown as Blob);
     }
+
 
     try {
       const response = await fetch(`http://${IP}:5000/candidates`, {
@@ -85,10 +87,10 @@ export default function DadosCandidato() {
         body: formData,
       });
 
+      console.log(response);
+
       if (response.ok) {
-        alert("Candidato guardado com sucesso!");
-        router.push("/Campanha");
-        navigation.goBack();
+        return
       } else {
         alert("Erro ao guardar o candidato");
       }
@@ -110,7 +112,7 @@ export default function DadosCandidato() {
         </TouchableOpacity>
 
         {/* Título com cor do partido */}
-        <Text style={[styles.title, { color: cor || "#4B2AFA" }]}>Dados do Candidato</Text>
+        <Text style={styles.title}>Dados do Candidato</Text>
 
         {/* Campos */}
         {[
@@ -181,22 +183,31 @@ export default function DadosCandidato() {
           ))}
         </View>
 
-        {/* Cor selecionada */}
-        {cor ? (
-          <View style={styles.previewCorContainer}>
-            <Text style={{ marginRight: 10 }}>Cor selecionada:</Text>
-            <View style={[styles.colorCircle, { backgroundColor: cor }]} />
-          </View>
-        ) : null}
-
         {/* Botão Guardar com cor do partido */}
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: cor || "#4B2AFA" }]}
-          onPress={guardarCandidato}
-          activeOpacity={0.8}
+        <TouchableOpacity style={styles.buttonModal} onPress={() => {
+          guardarCandidato();
+          setModalVisible(true);
+        }}
         >
-          <Text style={styles.buttonText}>Guardar</Text>
+          <Text style={styles.buttonTextModal}>Guardar Alterações</Text>
         </TouchableOpacity>
+
+        <Modal animationType="none" transparent={true} visible={modalVisible}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Candidato adicionado com sucesso</Text>
+              <Ionicons name="checkmark-circle" size={50} color="#4B2AFA" style={{ marginBottom: 10 }} />
+              <TouchableOpacity style={styles.buttonModal} onPress={() => {
+                setModalVisible(false);
+                router.push("/Campanha");
+              }}
+              >
+                <Text style={styles.buttonTextModal}>Voltar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+        <View style={{ height: 50 }} />
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -271,55 +282,71 @@ const styles = StyleSheet.create({
     height: 220,
     borderRadius: 15,
     marginBottom: 25,
-marginHorizontal: "5%",
-borderWidth: 1,
-borderColor: "#ddd",
-},
-label: {
-fontSize: 16,
-fontWeight: "600",
-marginBottom: 10,
-marginHorizontal: 20,
-color: "#444",
-},
-paletaContainer: {
-flexDirection: "row",
-flexWrap: "wrap",
-gap: 15,
-marginBottom: 20,
-justifyContent: "center",
-marginHorizontal: 10,
-},
-colorCircle: {
-width: 38,
-height: 38,
-borderRadius: 19,
-borderWidth: 2,
-borderColor: "transparent",
-},
-colorCircleSelected: {
-borderColor: "#4B2AFA",
-borderWidth: 3,
-},
-previewCorContainer: {
-flexDirection: "row",
-alignItems: "center",
-justifyContent: "center",
-marginBottom: 30,
-},
-button: {
-paddingVertical: 16,
-borderRadius: 15,
-alignItems: "center",
-marginHorizontal: 20,
-shadowColor: "#4B2AFA",
-shadowOpacity: 0.5,
-shadowOffset: { width: 0, height: 5 },
-shadowRadius: 10,
-},
-buttonText: {
-color: "#fff",
-fontWeight: "700",
-fontSize: 18,
-},
+    marginHorizontal: "5%",
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 10,
+    marginHorizontal: 20,
+    color: "#444",
+  },
+  paletaContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 15,
+    marginBottom: 20,
+    justifyContent: "center",
+    marginHorizontal: 10,
+  },
+  colorCircle: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    borderWidth: 2,
+    borderColor: "transparent",
+  },
+  colorCircleSelected: {
+    borderColor: "#4B2AFA",
+    borderWidth: 3,
+  },
+  previewCorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 30,
+  },
+  button: {
+    paddingVertical: 16,
+    borderRadius: 15,
+    alignItems: "center",
+    marginHorizontal: 20,
+    shadowColor: "#4B2AFA",
+    shadowOpacity: 0.5,
+    shadowOffset: { width: 0, height: 5 },
+    shadowRadius: 10,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 18,
+  },
+  buttonModal: {
+    backgroundColor: "#4B2AFA",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 10,
+    width: "100%",
+  },
+  buttonTextModal: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
+  modalContent: { width: "80%", backgroundColor: "#fff", padding: 20, borderRadius: 10, alignItems: "center" },
+  modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10, color: "#4B2AFA" },
+  modalButtons: { flexDirection: "row", marginTop: 15 },
 });

@@ -3,7 +3,7 @@ const Candidate = require('../models/Candidate');
 const upload = require('../middleware/upload');
 const router = express.Router();
 
-// GET - listar todos
+// GET
 router.get('/', async (req, res) => {
   try {
     const candidates = await Candidate.find();
@@ -13,9 +13,9 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST - adicionar candidato
+// POST
 router.post('/', upload.single('imagem'), async (req, res) => {
-  const { nome, partido, nascimento, naturalidade, biografia, cor } = req.body;
+  const { nome, partido, nascimento, naturalidade, biografia, cor, planoEleitoral } = req.body;
 
   if (!req.file) {
     return res.status(400).json({ message: "Imagem é obrigatória" });
@@ -31,6 +31,7 @@ router.post('/', upload.single('imagem'), async (req, res) => {
     biografia,
     imagem: imagePath,
     cor,
+    planoEleitoral,
   });
 
   try {
@@ -41,7 +42,7 @@ router.post('/', upload.single('imagem'), async (req, res) => {
   }
 });
 
-// DELETE - remover candidato
+// DELETE
 router.delete('/:id', async (req, res) => {
   const id = req.params.id;
 

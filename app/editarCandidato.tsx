@@ -9,7 +9,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Modal,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -38,6 +40,8 @@ export default function EditarCandidato() {
     planoEleitoral: "",
     cor: "",
   });
+  const [modalVisible, setModalVisible] = useState(false);
+  const [imagem, setImagem] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -45,7 +49,9 @@ export default function EditarCandidato() {
     const carregarCandidato = async () => {
       const dados = await AsyncStorage.getItem("candidatoSelecionado");
       if (dados) {
-        setCandidato(JSON.parse(dados));
+        const candidatoData = JSON.parse(dados);
+        setCandidato(candidatoData);
+        setImagem(candidatoData.imagem ? `http://${IP}:5000${candidatoData.imagem}` : null);
       }
     };
 
@@ -61,7 +67,7 @@ export default function EditarCandidato() {
     });
 
     if (!result.canceled) {
-      setCandidato({ ...candidato, imagem: result.assets[0].uri });
+      setImagem(result.assets[0].uri);
     }
   };
 
@@ -75,13 +81,13 @@ export default function EditarCandidato() {
     formData.append("planoEleitoral", candidato.planoEleitoral);
     formData.append("cor", candidato.cor);
 
-    if (candidato.imagem && !candidato.imagem.startsWith("http")) {
-      const uriParts = candidato.imagem.split(".");
+    if (imagem && imagem.startsWith("file://")) {
+      const uriParts = imagem.split(".");
       const fileType = uriParts[uriParts.length - 1];
 
       formData.append("imagem", {
-        uri: candidato.imagem,
-        name: `foto.${fileType}`,
+        uri: imagem,
+        name: `foto.${Date.now()}.${fileType}`,
         type: `image/${fileType}`,
       } as any);
     }
@@ -93,8 +99,7 @@ export default function EditarCandidato() {
       });
 
       if (response.ok) {
-        alert("Candidato atualizado com sucesso!");
-        router.push("/Campanha");
+        return
       } else {
         const erro = await response.text();
         console.error("Erro ao atualizar:", erro);
@@ -120,12 +125,9 @@ export default function EditarCandidato() {
 
         <TouchableOpacity style={styles.imagemButton} onPress={selecionarImagem}>
           <Image
-            source={
-              candidato.imagem?.startsWith("http")
-                ? { uri: candidato.imagem }
-                : require("../assets/images/icon.png")
-            }
+            source={imagem?.startsWith("/")? { uri: imagem } : require("../assets/images/icon.png")}
             style={styles.imagem}
+            resizeMode="cover"
           />
           <Text style={styles.imagemText}>Alterar Imagem</Text>
         </TouchableOpacity>
@@ -165,9 +167,31 @@ export default function EditarCandidato() {
           ))}
         </View>
 
-        <TouchableOpacity style={[styles.button, { backgroundColor: candidato.cor || "#4B2AFA" }]} onPress={salvarAlteracoes}>
+        <TouchableOpacity style={styles.button} onPress={() => {
+          salvarAlteracoes();
+          setModalVisible(true);
+        }}
+        >
           <Text style={styles.buttonText}>Guardar Alterações</Text>
         </TouchableOpacity>
+
+        <Modal animationType="none" transparent={true} visible={modalVisible}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Dados alterados com sucesso</Text>
+              <Ionicons name="checkmark-circle" size={50} color="#4B2AFA" style={{ marginBottom: 10 }} />
+              <TouchableOpacity style={styles.button} onPress={() => {
+                setModalVisible(false);
+                router.push("/Campanha");
+              }}
+              >
+                <Text style={styles.buttonText}>Voltar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        <View style={{ height: 50 }} />
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -205,6 +229,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 30,
     textAlign: "center",
+    color:"#4B2AFA"
   },
   imagemButton: {
     alignItems: "center",
@@ -255,13 +280,19 @@ const styles = StyleSheet.create({
     borderWidth: 3,
   },
   button: {
+    backgroundColor: "#4B2AFA",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
     marginTop: 10,
+    width: "100%",
   },
   buttonText: {
     color: "#fff",
     fontWeight: "bold",
   },
+  modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
+  modalContent: { width: "80%", backgroundColor: "#fff", padding: 20, borderRadius: 10, alignItems: "center" },
+  modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10, color: "#4B2AFA" },
+  modalButtons: { flexDirection: "row", marginTop: 15 },
 });

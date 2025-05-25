@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Modal, Alert, Image } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import { Swipeable } from 'react-native-gesture-handler';
 
@@ -19,6 +20,10 @@ export default function Campanha() {
   const [dataVotacao, setDataVotacao] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [candidatos, setCandidatos] = useState<Candidato[]>([]);
+  const [modalVisibleConfirm, setModalVisibleConfirm] = useState(false);
+  const [candidatoParaExcluir, setCandidatoParaExcluir] = useState<Candidato | null>(null);
+  const [modalVisibleElim, setModalVisibleElim] = useState(false);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -35,30 +40,29 @@ export default function Campanha() {
     fetchCandidatos();
   }, []);
 
-  const excluirCandidato = (id: string) => {
-    Alert.alert("Confirmar Exclusão", "Tem certeza de que deseja excluir este candidato?", [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Excluir",
-        onPress: async () => {
-          try {
-            const response = await fetch(`http://${IP}:5000/candidates/${id}`, {
-              method: "DELETE",
-            });
+  const abrirConfirmacaoExclusao = (candidato: Candidato) => {
+    setCandidatoParaExcluir(candidato);
+    setModalVisibleConfirm(true);
+  };
 
-            if (response.ok) {
-              setCandidatos(candidatos.filter(candidato => candidato._id !== id));
-              alert("Candidato excluído com sucesso!");
-            } else {
-              alert("Erro ao excluir o candidato.");
-            }
-          } catch (error) {
-            console.error("Erro na exclusão do candidato:", error);
-            alert("Ocorreu um erro ao tentar excluir o candidato.");
-          }
-        },
-      },
-    ]);
+  const excluirCandidato = async () => {
+    if (!candidatoParaExcluir) return;
+    try {
+      const response = await fetch(`http://${IP}:5000/candidates/${candidatoParaExcluir._id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setCandidatos(candidatos.filter(c => c._id !== candidatoParaExcluir._id));
+        setModalVisibleConfirm(false);
+        setModalVisibleElim(true);
+      } else {
+        alert("Erro ao excluir o candidato.");
+      }
+    } catch (error) {
+      console.error("Erro na exclusão do candidato:", error);
+      alert("Ocorreu um erro ao tentar excluir o candidato.");
+    }
   };
 
   const guardarData = async () => {
@@ -118,16 +122,22 @@ export default function Campanha() {
           renderItem={({ item }) => (
             <Swipeable
               renderLeftActions={() => (
-                <TouchableOpacity style={styles.editButton} onPress={async () => {
-                  await AsyncStorage.setItem("candidatoSelecionado", JSON.stringify(item));
-                  router.push("/editarCandidato");
-                }}>
+                <TouchableOpacity
+                  style={styles.editButton}
+                  onPress={async () => {
+                    await AsyncStorage.setItem("candidatoSelecionado", JSON.stringify(item));
+                    router.push("/editarCandidato");
+                  }}
+                >
                   <Text style={styles.deleteText}>Editar</Text>
                 </TouchableOpacity>
               )}
               renderRightActions={() => (
-                <TouchableOpacity style={styles.deleteButton} onPress={() => excluirCandidato(item._id)}>
-                  <Text style={styles.deleteText}>Excluir</Text>
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={() => abrirConfirmacaoExclusao(item)}
+                >
+                  <Text style={styles.deleteText}>Eliminar</Text>
                 </TouchableOpacity>
               )}
             >
@@ -149,6 +159,70 @@ export default function Campanha() {
             </Swipeable>
           )}
         />
+
+        {/* Modal de confirmação de exclusão */}
+        <Modal
+          animationType="none"
+          transparent={true}
+          visible={modalVisibleConfirm}
+          onRequestClose={() => setModalVisibleConfirm(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Confirmar Exclusão</Text>
+              <Text style={styles.modalText}>
+                Tem certeza de que deseja eliminar{" "}
+                <Text style={{ fontWeight: "bold" }}>
+                  {candidatoParaExcluir?.nome}
+                </Text>?
+              </Text>
+              <Text style={styles.modalSubtext}>Esta ação não pode ser desfeita.</Text>
+
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={styles.cancelButton}
+                  onPress={() => setModalVisibleConfirm(false)}
+                >
+                  <Text style={styles.cancelText}>Cancelar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.confirmButton}
+                  onPress={excluirCandidato}
+                >
+                  <Text style={styles.confirmText}>Confirmar</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Modal de sucesso exclusão */}
+        <Modal
+          animationType="none"
+          transparent={true}
+          visible={modalVisibleElim}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitleSuc}>Candidato eliminado com sucesso</Text>
+              <Ionicons
+                name="checkmark-circle"
+                size={50}
+                color="#4B2AFA"
+                style={{ marginBottom: 10 }}
+              />
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => {
+                  setModalVisibleElim(false);
+                  router.push("/Campanha");
+                }}
+              >
+                <Text style={styles.buttonText}>Voltar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </View>
     </View>
   );
@@ -258,4 +332,27 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     backgroundColor: "#ddd",
   },
+  button: {
+    backgroundColor: "#4B2AFA",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 10,
+    width: "100%",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
+  modalContent: { width: "80%", backgroundColor: "#fff", padding: 20, borderRadius: 10, alignItems: "center" },
+  modalTitleSuc: { fontSize: 18, fontWeight: "bold", marginBottom: 10, color: "#4B2AFA" },
+  modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10, color: "#4B2AFA" },
+  modalText: { fontSize: 14, textAlign: "center", fontWeight: "bold" },
+  modalSubtext: { fontSize: 12, textAlign: "center", color: "#777", marginVertical: 10 },
+  modalButtons: { flexDirection: "row", marginTop: 15 },
+  cancelButton: { padding: 10, borderRadius: 5, marginRight: 10, borderWidth: 1, borderColor: "#4B2AFA" },
+  cancelText: { color: "#4B2AFA", fontWeight: "bold" },
+  confirmButton: { backgroundColor: "#4B2AFA", padding: 10, borderRadius: 5 },
+  confirmText: { color: "#fff", fontWeight: "bold" },
 });

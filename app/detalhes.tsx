@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, ActivityIndicator } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getVotoContract } from "./contracts/votoContractV2"; 
+import { getVotoContract } from "./contracts/votoContractV2";
+import { Ionicons } from '@expo/vector-icons';
 import { IP } from "../config";
 
 interface Candidato {
@@ -19,6 +20,7 @@ interface Candidato {
 export default function CandidateDetails() {
   const { id } = useLocalSearchParams();
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisibleConfirm, setModalVisibleConfirm] = useState(false);
   const [candidato, setCandidato] = useState<Candidato | null>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState({ telefone: "", codigoPessoal: "" });
@@ -36,7 +38,7 @@ export default function CandidateDetails() {
       try {
         const response = await fetch(`http://${IP}:5000/candidates`);
         const contentType = response.headers.get("content-type");
-        
+
         if (!response.ok || !contentType?.includes("application/json")) {
           throw new Error("Resposta inválida da API");
         }
@@ -165,9 +167,8 @@ export default function CandidateDetails() {
       <Modal animationType="none" transparent={true} visible={modalVisible}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Confirmation</Text>
-            <Text style={styles.modalText}>Are you sure? Your vote cannot be changed.</Text>
-            <Text style={styles.modalSubtext}>After casting your vote, you will receive a confirmation message.</Text>
+            <Text style={styles.modalTitle}>Confirmação</Text>
+            <Text style={styles.modalText}>Tem a certeza? O seu voto não pode ser alterado.</Text>
 
             <View style={styles.modalButtons}>
               <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
@@ -176,6 +177,8 @@ export default function CandidateDetails() {
               <TouchableOpacity
                 style={styles.confirmButton}
                 onPress={async () => {
+                  setModalVisibleConfirm(true);
+
                   try {
                     const contrato = await getVotoContract();
                     const contractId = candidatoIdMap[id as string];
@@ -194,11 +197,27 @@ export default function CandidateDetails() {
                     console.log("Erro ao votar:", err);
                     alert("Erro ao registar voto. Tente novamente.");
                   }
+
                 }}
               >
                 <Text style={styles.confirmText}>Confirm</Text>
               </TouchableOpacity>
             </View>
+          </View>
+        </View>
+      </Modal>
+      <Modal animationType="none" transparent={true} visible={modalVisibleConfirm}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Candidato adicionado com sucesso</Text>
+            <Ionicons name="checkmark-circle" size={50} color="#4B2AFA" style={{ marginBottom: 10 }} />
+            <TouchableOpacity style={styles.buttonModal} onPress={() => {
+              setModalVisible(false);
+              router.push("/Campanha");
+            }}
+            >
+              <Text style={styles.buttonTextModal}>Voltar</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -232,19 +251,19 @@ const styles = StyleSheet.create({
   party: { fontSize: 16, color: "#777", marginBottom: 20 },
   voteButton: { backgroundColor: "#4B2AFA", padding: 15, borderRadius: 10, alignItems: "center", marginBottom: 20 },
   voteText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
-  tabs: { 
-    flexDirection: "row", 
+  tabs: {
+    flexDirection: "row",
     marginBottom: 10,
     paddingHorizontal: 10,
   },
-  activeTab: { 
-    fontWeight: "bold", 
-    color: "#4B2AFA", 
+  activeTab: {
+    fontWeight: "bold",
+    color: "#4B2AFA",
     paddingBottom: 5,
-    borderBottomWidth: 2, 
-    borderBottomColor: "#6C63FF" 
+    borderBottomWidth: 2,
+    borderBottomColor: "#6C63FF"
   },
-  inactiveTab: { 
+  inactiveTab: {
     color: "#777",
     paddingBottom: 5,
   },
@@ -263,4 +282,16 @@ const styles = StyleSheet.create({
   cancelText: { color: "#4B2AFA", fontWeight: "bold" },
   confirmButton: { backgroundColor: "#4B2AFA", padding: 10, borderRadius: 5 },
   confirmText: { color: "#fff", fontWeight: "bold" },
+  buttonTextModal: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  buttonModal: {
+    backgroundColor: "#4B2AFA",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 10,
+    width: "100%",
+  },
 });

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, KeyboardAvoidingView, Modal, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
@@ -10,6 +10,7 @@ import { IP } from "../config";
 export default function EditarPerfil() {
   const router = useRouter();
 
+  const [modalVisible, setModalVisible] = useState(false);
   const [nome, setNome] = useState("");
   const [sobrenome, setSobrenome] = useState("");
   const [senha, setSenha] = useState("");
@@ -104,8 +105,6 @@ export default function EditarPerfil() {
         if (contentType && contentType.includes("application/json")) {
           const data = await response.json();
           await AsyncStorage.setItem("user", JSON.stringify(data.user));
-          alert("Perfil atualizado com sucesso!");
-          router.push("/perfil");
         } else {
           const texto = await response.text();
           console.warn("Resposta não-JSON recebida:", texto);
@@ -191,10 +190,32 @@ export default function EditarPerfil() {
 
       {erroSenha !== "" && <Text style={styles.erroTexto}>{erroSenha}</Text>}
 
-      <TouchableOpacity style={styles.button} onPress={alterarDados}>
-        <Text style={styles.buttonText}>Salvar</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          alterarDados();
+          setModalVisible(true);
+        }}
+      >
+        <Text style={styles.buttonText}>Guardar Alterações</Text>
       </TouchableOpacity>
-    </KeyboardAvoidingView>
+
+      <Modal animationType="none" transparent={true} visible={modalVisible}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Dados alterados com sucesso</Text>
+            <Ionicons name="checkmark-circle" size={50} color="#4B2AFA" style={{ marginBottom: 10 }} />
+            <TouchableOpacity style={styles.button} onPress={() => {
+              setModalVisible(false);
+              router.push("/perfil");
+            }}
+            >
+              <Text style={styles.buttonText}>Voltar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </KeyboardAvoidingView >
   );
 }
 
@@ -230,6 +251,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     marginTop: -150,
     textAlign: "center",
+    color: "#4B2AFA"
   },
   inputContainer: {
     width: "100%",
@@ -287,4 +309,8 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
+  modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
+  modalContent: { width: "80%", backgroundColor: "#fff", padding: 20, borderRadius: 10, alignItems: "center" },
+  modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10, color: "#4B2AFA" },
+  modalButtons: { flexDirection: "row", marginTop: 15 },
 });
