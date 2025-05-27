@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, ActivityIndicator, Image } from "react-native";
 import { getVotoContract, obterVotosPorCandidato, obterTotalVotos } from "./contracts/votoContractV2";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import { IP } from "../config";
 
 export default function Voto() {
@@ -10,89 +9,122 @@ export default function Voto() {
   const [candidatoNome, setCandidatoNome] = useState<string | null>(null);
   const [candidato, setCandidato] = useState<any>(null);
   const [carregando, setCarregando] = useState(false);
-  const [candidatoCorrespondente, setCandidatoCorrespondente] = useState<any>(null);
   const [votacaoTerminada, setvotacaoTerminada] = useState(false);
-  const [showVote, setShowVote] = useState(false);
   const [firstTime, setFirstTime] = useState(true);
   const [resultados, setResultados] = useState<{ votos: number; id: number; partido: string; cor: string; percentagem: number }[]>([]);
-  const [user, setUser] = useState({ role: "" });
+  const [user, setUser] = useState<{ role: string, telefone?: string }>({ role: "" });
+  const [loading, setLoading] = useState(true);
+  const [carregaResultados, setCarregaResultados] = useState(false);
 
   useEffect(() => {
-
-    const fetchUser = async () => {
+    const init = async () => {
+      setLoading(true);
       try {
-        const token = await AsyncStorage.getItem("token");
-
-        const response = await fetch(`http://${IP}:5000/auth/perfil`, {
-          method: "GET",
-          headers: { "Authorization": `Bearer ${token}` },
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          setUser(data);
-        } else {
-          alert("Erro ao carregar perfil");
-        }
-      } catch (error) {
-        console.error("Erro ao buscar perfil:", error);
-      }
-    };
-
-    const carregarResultados = async () => {
-      try {
-        const res = await fetch(`http://${IP}:5000/candidates`);
-        const candidatos = await res.json();
-
-        const totalVotos = await obterTotalVotos();
-
-        const map: Record<string, number> = {};
-        candidatos.forEach((candidato: any, index: number) => {
-          map[candidato._id] = index + 1;
-        });
-
-        fetchUser();
-
-        const resultadosVotacao = await Promise.all(
-          candidatos.map(async (candidato: any) => {
-            const candidatoId = map[candidato._id];
-            let votos = 0;
-
-            try {
-              votos = await obterVotosPorCandidato(candidatoId);
-            } catch (err) {
-              console.error(`Erro ao obter votos para candidato ${candidatoId}:`, err);
-            }
-
-            return {
-              id: candidatoId,
-              partido: candidato.partido,
-              cor: candidato.cor,
-              votos,
-              percentagem: totalVotos ? (votos / totalVotos) * 100 : 0,
-            };
-          })
-        );
-
-        setResultados(resultadosVotacao);
+        await fetchUser();
       } catch (err) {
-        console.error("Erro ao carregar resultados:", err);
+        console.error("Erro a buscar perfil:", err);
+      } finally {
+        setLoading(false);
       }
     };
-
-    const verificarEleicao = async () => {
-      const resultado = await AsyncStorage.getItem("votacaoTerminada");
-      const terminou = resultado === "true";
-      setvotacaoTerminada(terminou);
-
-      if (terminou) {
-        carregarResultados();
-      }
-    };
-
-    verificarEleicao();
+    init();
   }, []);
+
+  useEffect(() => {
+    if (user.role) {
+      carregarCodigoGuardado();
+      verificarEleicao();
+    }
+  }, [user.role]);
+
+  const fetchUser = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      const response = await fetch(`http://${IP}:5000/auth/perfil`, {
+        method: "GET",
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUser(data);
+      } else {
+        alert("Erro ao carregar perfil");
+      }
+    } catch (error) {
+      console.error("Erro ao buscar perfil:", error);
+    }
+  };
+
+  const carregarResultados = async () => {
+    setCarregaResultados(true);
+    try {
+      const res = await fetch(`http://${IP}:5000/candidates`);
+      const candidatos = await res.json();
+
+      const totalVotos = await obterTotalVotos();
+
+      const map: Record<string, number> = {};
+      candidatos.forEach((candidato: any, index: number) => {
+        map[candidato._id] = index + 1;
+      });
+
+      const resultadosVotacao = await Promise.all(
+        candidatos.map(async (candidato: any) => {
+          const candidatoId = map[candidato._id];
+          let votos = 0;
+
+          try {
+            votos = await obterVotosPorCandidato(candidatoId);
+          } catch (err) {
+            console.error(`Erro ao obter votos para candidato ${candidatoId}:`, err);
+          }
+
+          return {
+            id: candidatoId,
+            partido: candidato.partido,
+            cor: candidato.cor,
+            votos,
+            percentagem: totalVotos ? (votos / totalVotos) * 100 : 0,
+          };
+        })
+      );
+
+      setResultados(resultadosVotacao.sort((a, b) => b.percentagem - a.percentagem));
+    } catch (err) {
+      console.error("Erro ao carregar resultados:", err);
+    }
+    setCarregaResultados(false);
+  };
+
+  const carregarCodigoGuardado = async () => {
+    if (!user.telefone) return;
+
+    const codigoGuardado = await AsyncStorage.getItem(`codigoPessoal_${user.telefone}`);
+
+    if (codigoGuardado) {
+      setCodigoPessoal(codigoGuardado);
+      setFirstTime(false);
+      const contrato = await getVotoContract();
+      const candidatoId: number = await contrato.consultarVoto(codigoGuardado);
+      await buscarCandidato(Number(candidatoId));
+    } else {
+      setFirstTime(true);
+    }
+  };
+
+  const verificarEleicao = async () => {
+    const resultado = await AsyncStorage.getItem("votacaoTerminada");
+    const terminou = resultado === "true";
+    setvotacaoTerminada(terminou);
+
+    if (terminou || user.role === "Admin") {
+      await carregarResultados();
+    }
+  };
+
 
   const buscarCandidato = async (id: number) => {
     try {
@@ -128,6 +160,10 @@ export default function Voto() {
       const contrato = await getVotoContract();
       const candidatoId: number = await contrato.consultarVoto(codigoPessoal);
 
+      if (user.telefone) {
+        await AsyncStorage.setItem(`codigoPessoal_${user.telefone}`, codigoPessoal);
+      }
+
       await buscarCandidato(Number(candidatoId));
       setFirstTime(false);
 
@@ -147,6 +183,14 @@ export default function Voto() {
     }
   };
 
+  if (loading) {
+    return (
+      <View style={[styles.container, { flex: 1, justifyContent: "center", alignItems: "center", height: 800 }]}>
+        <ActivityIndicator size="large" color="#4B2AFA" />
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container}>
       {firstTime ? (
@@ -160,6 +204,7 @@ export default function Voto() {
             style={styles.verificacaoInput}
             placeholder="Ex: aB123xyz"
             autoCapitalize="none"
+            placeholderTextColor="#999"
             value={codigoPessoal}
             onChangeText={setCodigoPessoal}
           />
@@ -176,99 +221,115 @@ export default function Voto() {
         <>
           {user.role === "User" && (
             <>
-              {!votacaoTerminada ? (
+              {carregaResultados ? (
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center", height: 800 }}>
+                  <ActivityIndicator size="large" color="#4B2AFA" />
+                </View>
+              ) : !votacaoTerminada ? (
+                candidato ? (  // Só mostra quando candidato estiver definido
+                  <>
+                    <View style={styles.header}>
+                      <Text style={styles.headerTitle}>O teu voto foi em:</Text>
+                    </View>
+                    <View style={styles.candidateCard}>
+                      <Image
+                        source={
+                          candidato.imagem && candidato.imagem.startsWith("/")
+                            ? { uri: `http://${IP}:5000${candidato.imagem}` }
+                            : require("../assets/images/default-avatar-icon.jpg")
+                        }
+                        style={styles.candidateImage}
+                      />
+                      <Text style={styles.candidateName}>{candidato.nome}</Text>
+                    </View>
+                    <Text style={styles.candidatoBiografia}>{candidato.biografia}</Text>
+                  </>
+                ) : (
+                  <View style={{ flex: 1, justifyContent: "center", alignItems: "center", height: 800 }}>
+                    <ActivityIndicator size="large" color="#4B2AFA" />
+                  </View>
+                )
+              ) : (
                 <>
                   <View style={styles.header}>
-                    <Text style={styles.headerTitle}>O teu voto foi em:</Text>
+                    <Text style={styles.headerTitle}>Painel de Resultados</Text>
                   </View>
-                  <View style={styles.candidateCard}>
-                    <Image
-                      source={
-                        candidato.imagem?.startsWith("/")
-                          ? { uri: `http://${IP}:5000${candidato.imagem}` }
-                          : require("../assets/images/icon.png")
-                      }
-                      style={styles.candidateImage}
-                    />
-                    <Text style={styles.candidateName}>{candidato.nome}</Text>
-                  </View>
-                  <Text style={styles.candidatoBiografia}>
-                    {candidato.biografia}
-                  </Text>
-                </>
-              ) : <>
-                <View style={styles.header}>
-                  <Text style={styles.headerTitle}>Painel de Resultados</Text>
-                </View>
-                <View>
-                  {resultados.length > 0 ? (
-                    resultados.map((item, index) => (
-                      <View key={index} style={styles.resultContainer}>
-                        <Text style={styles.partidoText}>
-                          {item.partido} - {item.percentagem.toFixed(2)}%
-                        </Text>
-                        <View style={styles.progressBarBackground}>
-                          <View
-                            style={{
-                              ...styles.progressBarFill,
-                              width: `${item.percentagem}%`,
-                              backgroundColor: item.cor,
-                            }}
-                          />
+                  <View>
+                    {resultados.length > 0 ? (
+                      resultados.map((item, index) => (
+                        <View key={index} style={styles.resultContainer}>
+                          <Text style={styles.partidoText}>
+                            {item.partido} - {item.percentagem.toFixed(2)}%
+                          </Text>
+                          <View style={styles.progressBarBackground}>
+                            <View
+                              style={{
+                                ...styles.progressBarFill,
+                                width: `${item.percentagem}%`,
+                                backgroundColor: item.cor,
+                              }}
+                            />
+                          </View>
+                          <Text style={styles.votosText}>
+                            Votos: {item.votos.toLocaleString()}
+                          </Text>
                         </View>
-                        <Text style={styles.votosText}>
-                          Votos: {item.votos.toLocaleString()}
-                        </Text>
-                      </View>
-                    ))
-                  ) : (
-                    <Text style={styles.waitingText}>Nenhum resultado encontrado.</Text>
-                  )}
-                </View>
-              </>}
+                      ))
+                    ) : (
+                      <Text style={styles.waitingText}>Nenhum resultado encontrado.</Text>
+                    )}
+                  </View>
+                </>
+              )}
             </>
           )}
 
-          {/* Renderização dos resultados para administradores */}
           {user.role === "Admin" && (
             <>
-              <View style={styles.header}>
-                <Text style={styles.headerTitle}>Painel de Resultados</Text>
-              </View>
-              <View>
-                {resultados.length > 0 ? (
-                  resultados.map((item, index) => (
-                    <View key={index} style={styles.resultContainer}>
-                      <Text style={styles.partidoText}>
-                        {item.partido} - {item.percentagem.toFixed(2)}%
-                      </Text>
-                      <View style={styles.progressBarBackground}>
-                        <View
-                          style={{
-                            ...styles.progressBarFill,
-                            width: `${item.percentagem}%`,
-                            backgroundColor: item.cor,
-                          }}
-                        />
-                      </View>
-                      <Text style={styles.votosText}>
-                        Votos: {item.votos.toLocaleString()}
-                      </Text>
-                    </View>
-                  ))
-                ) : (
-                  <Text style={styles.waitingText}>Nenhum resultado encontrado.</Text>
-                )}
-              </View>
+              {carregaResultados ? (
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center", height: 800 }}>
+                  <ActivityIndicator size="large" color="#4B2AFA" />
+                </View>
+              ) : (
+                <>
+                  <View style={styles.header}>
+                    <Text style={styles.headerTitle}>Painel de Resultados</Text>
+                  </View>
+
+                  <View>
+                    {resultados.length > 0 ? (
+                      resultados.map((item, index) => (
+                        <View key={index} style={styles.resultContainer}>
+                          <Text style={styles.partidoText}>
+                            {item.partido} - {item.percentagem.toFixed(2)}%
+                          </Text>
+                          <View style={styles.progressBarBackground}>
+                            <View
+                              style={{
+                                ...styles.progressBarFill,
+                                width: `${item.percentagem}%`,
+                                backgroundColor: item.cor,
+                              }}
+                            />
+                          </View>
+                          <Text style={styles.votosText}>
+                            Votos: {item.votos.toLocaleString()}
+                          </Text>
+                        </View>
+                      ))
+                    ) : (
+                      <Text style={styles.waitingText}>Nenhum resultado encontrado.</Text>
+                    )}
+                  </View>
+                </>
+              )}
             </>
           )}
         </>
-
       )}
+      <View style={{ height: 70 }} />
     </ScrollView>
-
   );
-
 }
 
 const styles = StyleSheet.create({
@@ -321,25 +382,11 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginBottom: 20,
   },
-  voteRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 5,
-  },
-  eyeIcon: {
-    marginLeft: 10,
-    marginTop: 5,
-  },
   headerTitle: {
     color: "#fff",
     fontSize: 32,
     textAlign: "center",
     fontWeight: "bold",
-  },
-  headerCandidato: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "bold"
   },
   waitingText: {
     textAlign: "center",
@@ -374,7 +421,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#555"
   },
-  candidateImage: { width: 200, height: 200, borderRadius: 30, alignSelf: "center" },
+  candidateImage: {
+    width: 200,
+    height: 200,
+    borderRadius: 30,
+    alignSelf: "center"
+  },
   candidateCard: {
     backgroundColor: "#fff",
     padding: 10,
@@ -389,6 +441,14 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     alignSelf: "center"
   },
-  candidateName: { fontSize: 24, fontWeight: "bold", alignSelf: "center", padding: 20 },
-  candidatoBiografia: { fontSize: 18, padding: 20 },
+  candidateName: {
+    fontSize: 24,
+    fontWeight: "bold",
+    alignSelf: "center",
+    padding: 20
+  },
+  candidatoBiografia: {
+    fontSize: 18,
+    padding: 20
+  },
 });

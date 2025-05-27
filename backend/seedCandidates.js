@@ -28,7 +28,7 @@ const seedCandidates = async () => {
       nascimento: "15/01/1983",
       naturalidade: "Lisboa",
       biografia: "Líder do CHEGA, foco em segurança e políticas conservadoras.",
-      imagem:"uploads/VENTURA.jpg",
+      imagem: "uploads/VENTURA.jpg",
       cor: "#F44336",
       planoEleitoral: "André Ventura defende o reforço da justiça e combate à criminalidade, políticas rigorosas de imigração, redução de impostos e incentivo ao empreendedorismo, além da valorização dos valores tradicionais."
     },
@@ -77,10 +77,9 @@ const seedCandidates = async () => {
   try {
     const existingCandidates = await Candidate.find();
     if (existingCandidates.length > 0) {
-      return; // Evita duplicar a inserção
+      return;
     }
     await Candidate.insertMany(candidates);
-    console.log("Candidatos portugueses inseridos com sucesso.");
   } catch (err) {
     console.error("Erro ao inserir candidatos:", err);
   }

@@ -4,7 +4,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 
 export default function Verificacao() {
   const router = useRouter();
-  const { telefone } = useLocalSearchParams(); // Obtém o número passado na navegação
+  const { telefone } = useLocalSearchParams(); 
   const [codigo, setCodigo] = useState("");
 
   return (

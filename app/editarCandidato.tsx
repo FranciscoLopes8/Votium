@@ -125,7 +125,7 @@ export default function EditarCandidato() {
 
         <TouchableOpacity style={styles.imagemButton} onPress={selecionarImagem}>
           <Image
-            source={imagem?.startsWith("/")? { uri: imagem } : require("../assets/images/icon.png")}
+            source={imagem?.startsWith("/") ? { uri: imagem } : require("../assets/images/default-avatar-icon.jpg")}
             style={styles.imagem}
             resizeMode="cover"
           />
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 30,
     textAlign: "center",
-    color:"#4B2AFA"
+    color: "#4B2AFA"
   },
   imagemButton: {
     alignItems: "center",

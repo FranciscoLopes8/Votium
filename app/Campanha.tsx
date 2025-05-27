@@ -146,7 +146,7 @@ export default function Campanha() {
                   source={
                     item.imagem && item.imagem.startsWith("/")
                       ? { uri: `http://${IP}:5000${item.imagem}` }
-                      : require("../assets/images/icon.png")
+                      : require("../assets/images/default-avatar-icon.jpg")
                   }
                   style={styles.candidateImage}
                   resizeMode="cover"
@@ -346,8 +346,8 @@ const styles = StyleSheet.create({
   },
   modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
   modalContent: { width: "80%", backgroundColor: "#fff", padding: 20, borderRadius: 10, alignItems: "center" },
-  modalTitleSuc: { fontSize: 18, fontWeight: "bold", marginBottom: 10, color: "#4B2AFA" },
-  modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10, color: "#4B2AFA" },
+  modalTitleSuc: { fontSize: 18, fontWeight: "bold", marginBottom: 10, color: "#4B2AFA", textAlign: "center" },
+  modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10, color: "#4B2AFA", textAlign: "center" },
   modalText: { fontSize: 14, textAlign: "center", fontWeight: "bold" },
   modalSubtext: { fontSize: 12, textAlign: "center", color: "#777", marginVertical: 10 },
   modalButtons: { flexDirection: "row", marginTop: 15 },

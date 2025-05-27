@@ -19,6 +19,9 @@ export default function Home() {
   const [user, setUser] = useState({ primeiroNome: "", ultimoNome: "", role: "", codigoPessoal: "", imagem: "" });
   const [candidatos, setCandidatos] = useState<Candidato[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingUser, setLoadingUser] = useState(true);
+  const [loadingCandidatos, setLoadingCandidatos] = useState(true);
+  const [loadingData, setLoadingData] = useState(true);
   const [tempoRestante, setTempoRestante] = useState({ dias: 0, horas: 0, minutos: 0, segundos: 0 });
 
   useEffect(() => {
@@ -45,6 +48,9 @@ export default function Home() {
       } catch (error) {
         console.error("Erro ao buscar perfil:", error);
       }
+      finally {
+        setLoadingUser(false);
+      }
     };
 
     const fetchCandidatos = async () => {
@@ -55,7 +61,7 @@ export default function Home() {
       } catch (error) {
         console.error("Erro ao buscar candidatos:", error);
       } finally {
-        setLoading(false);
+        setLoadingCandidatos(false);
       }
     };
 
@@ -64,6 +70,7 @@ export default function Home() {
         const dataStr = await AsyncStorage.getItem("dataVotacao");
         if (dataStr) {
           const dataVotacao = new Date(dataStr);
+          await AsyncStorage.setItem("votacaoTerminada", "false");
           iniciarContagemRegressiva(dataVotacao);
         }
       } catch (error) {
@@ -97,11 +104,16 @@ export default function Home() {
       const segundos = Math.floor((restante % (1000 * 60)) / 1000);
 
       setTempoRestante({ dias, horas, minutos, segundos });
+      setLoadingData(false);
     }, 1000);
   };
 
-  if (loading) {
-    return <ActivityIndicator size="large" color="#6C63FF" style={styles.loading} />;
+  if (loadingUser || loadingCandidatos || loadingData) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", height: 800, backgroundColor: "#fff" }}>
+        <ActivityIndicator size="large" color="#4B2AFA" />
+      </View>
+    );
   }
 
   return (
@@ -112,7 +124,7 @@ export default function Home() {
           <Image source={
             user.imagem?.startsWith("/")
               ? { uri: `http://${IP}:5000${user.imagem}` }
-              : require("../assets/images/icon.png")
+              : require("../assets/images/default-avatar-icon.jpg")
           }
             style={styles.profilePic}
           />
@@ -150,7 +162,7 @@ export default function Home() {
               source={
                 item.imagem?.startsWith("/")
                   ? { uri: `http://${IP}:5000${item.imagem}` }
-                  : require("../assets/images/icon.png")
+                  : require("../assets/images/default-avatar-icon.jpg")
               }
               style={styles.candidateImage}
             />

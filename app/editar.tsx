@@ -134,7 +134,7 @@ export default function EditarPerfil() {
 
       <TouchableOpacity style={styles.imagemButton} onPress={selecionarImagem}>
         <Image
-          source={imagem ? { uri: imagem } : require("../assets/images/icon.png")}
+          source={imagem ? { uri: imagem } : require("../assets/images/default-avatar-icon.jpg")}
           style={styles.imagem}
         />
         <Text style={styles.imagemText}>Alterar Imagem</Text>

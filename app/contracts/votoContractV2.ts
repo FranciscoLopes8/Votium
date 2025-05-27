@@ -12,9 +12,9 @@ export const VOTO_ABI = [
     "function jaVotou(address) public view returns (bool)",
 ];
 
-export const VOTO_ADDRESS = "0x5912dF6bD32C4C0AA4271ec525e351bc37b661f4";
+export const VOTO_ADDRESS = "0x899C18b187E2EE674039462720B3780A2DbA1314";
 
-export const GANACHE_URL = "HTTP://172.20.10.4:7545";
+export const GANACHE_URL = `HTTP://${IP}:7545`;
 
 const fetchUserPrivateKey = async () => {
     try {
@@ -88,7 +88,6 @@ export const consultarVoto = async (codigoPessoal: string) => {
     try {
         const contrato = await getVotoContract();
 
-        // Chamada à função para consultar o voto
         const candidatoId = await contrato.consultarVoto(codigoPessoal);
 
         return candidatoId;

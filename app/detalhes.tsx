@@ -25,6 +25,9 @@ export default function CandidateDetails() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState({ telefone: "", codigoPessoal: "" });
   const [candidatoIdMap, setCandidatoIdMap] = useState<Record<string, number>>({});
+  const [modalVotoSucesso, setModalVotoSucesso] = useState(false);
+  const [modalVotoErro, setModalVotoErro] = useState(false);
+
   const [activeTab, setActiveTab] = useState<'Profile' | 'Campaign'>('Profile');
 
   useEffect(() => {
@@ -116,7 +119,7 @@ export default function CandidateDetails() {
       <Image
         source={candidato.imagem?.startsWith("/")
           ? { uri: `http://${IP}:5000${candidato.imagem}` }
-          : require("../assets/images/icon.png")}
+          : require("../assets/images/default-avatar-icon.jpg")}
         style={styles.image}
       />
       <Text style={styles.name}>{candidato.nome}</Text>
@@ -157,7 +160,7 @@ export default function CandidateDetails() {
           <>
             <Text style={styles.label}>Plano Eleitoral:</Text>
             <Text style={styles.text}>
-              {candidato.planoEleitoral || "No electoral plan available"}
+              {candidato.planoEleitoral || "Sem Plano Eleitoral disponível"}
             </Text>
           </>
         )}
@@ -191,11 +194,14 @@ export default function CandidateDetails() {
                     const tx = await contrato.votar(contractId, user.codigoPessoal, { gasLimit: 1000000 });
                     await tx.wait();
 
-                    alert("Voto registado com sucesso!");
                     setModalVisible(false);
+                    setModalVisibleConfirm(false);
+                    setModalVotoSucesso(true);
                   } catch (err) {
                     console.log("Erro ao votar:", err);
-                    alert("Erro ao registar voto. Tente novamente.");
+                    setModalVisible(false);
+                    setModalVisibleConfirm(false);
+                    setModalVotoErro(true);
                   }
 
                 }}
@@ -206,17 +212,42 @@ export default function CandidateDetails() {
           </View>
         </View>
       </Modal>
-      <Modal animationType="none" transparent={true} visible={modalVisibleConfirm}>
+      <Modal animationType="none" transparent={true} visible={modalVotoSucesso}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Candidato adicionado com sucesso</Text>
-            <Ionicons name="checkmark-circle" size={50} color="#4B2AFA" style={{ marginBottom: 10 }} />
-            <TouchableOpacity style={styles.buttonModal} onPress={() => {
-              setModalVisible(false);
-              router.push("/Campanha");
-            }}
+            <Text style={styles.modalTitle}>Voto registado com sucesso.</Text>
+            <Ionicons
+              name="checkmark-circle"
+              size={50}
+              color="#4B2AFA"
+              style={{ marginBottom: 10 }}
+            />
+            <TouchableOpacity
+              style={styles.buttonModal}
+              onPress={() => {
+                setModalVotoSucesso(false);
+              }}
             >
               <Text style={styles.buttonTextModal}>Voltar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      <Modal animationType="none" transparent={true} visible={modalVotoErro}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Erro ao registar voto</Text>
+            <Ionicons
+              name="close-circle"
+              size={50}
+              color="#4B2AFA"
+              style={{ marginBottom: 10 }}
+            />
+            <TouchableOpacity
+              style={styles.buttonModal}
+              onPress={() => setModalVotoErro(false)}
+            >
+              <Text style={styles.buttonTextModal}>Fechar</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -274,7 +305,7 @@ const styles = StyleSheet.create({
   // Modal styles
   modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
   modalContent: { width: "80%", backgroundColor: "#fff", padding: 20, borderRadius: 10, alignItems: "center" },
-  modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
+  modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10, color: "#4B2AFA" },
   modalText: { fontSize: 14, textAlign: "center", fontWeight: "bold" },
   modalSubtext: { fontSize: 12, textAlign: "center", color: "#777", marginVertical: 10 },
   modalButtons: { flexDirection: "row", marginTop: 15 },

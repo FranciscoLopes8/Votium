@@ -11,6 +11,7 @@ export default function Profile() {
   const router = useRouter();
   const [showCode, setShowCode] = useState(false);
   const [user, setUser] = useState({ primeiroNome: "", ultimoNome: "", role: "", codigoPessoal: "", imagem: "" });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -44,6 +45,10 @@ export default function Profile() {
     }
   };
 
+  const imageUri = user.imagem?.startsWith("/")
+    ? { uri: `http://${IP}:5000${user.imagem}` }
+    : require("../assets/images/default-avatar-icon.jpg");
+
   return (
     <View style={styles.container}>
       {/* Perfil */}
@@ -51,7 +56,7 @@ export default function Profile() {
         source={
           user.imagem?.startsWith("/")
             ? { uri: `http://${IP}:5000${user.imagem}` }
-            : require("../assets/images/icon.png")
+            : require("../assets/images/default-avatar-icon.jpg")
         }
         style={styles.profilePic}
       />
