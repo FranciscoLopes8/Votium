@@ -7,7 +7,7 @@ const crypto = require("crypto");
 const User = require("../models/User");
 const router = express.Router();
 
-const GANACHE_URL = "HTTP://192.168.1.183:7545";
+const GANACHE_URL = "HTTP://192.168.1.80:7545";
 const provider = new ethers.providers.JsonRpcProvider(GANACHE_URL);
 
 const generateSecureCode = (length = 8) => {

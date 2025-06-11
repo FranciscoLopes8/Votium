@@ -5,7 +5,8 @@ import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
-import { Swipeable } from 'react-native-gesture-handler';
+import { Swipeable} from 'react-native-gesture-handler';
+import { Switch } from "react-native";
 
 import { IP } from "../config";
 
@@ -23,6 +24,7 @@ export default function Campanha() {
   const [modalVisibleConfirm, setModalVisibleConfirm] = useState(false);
   const [candidatoParaExcluir, setCandidatoParaExcluir] = useState<Candidato | null>(null);
   const [modalVisibleElim, setModalVisibleElim] = useState(false);
+  const [anonima, setAnonima] = useState(false);
 
   const router = useRouter();
 
@@ -36,13 +38,24 @@ export default function Campanha() {
         console.error("Erro ao buscar candidatos:", error);
       }
     };
-
+    const fetchAnonima = async () => {
+      const value = await AsyncStorage.getItem("campanhaAnonima");
+      if (value !== null) setAnonima(value === "true");
+    };
+    fetchAnonima();     
     fetchCandidatos();
   }, []);
 
   const abrirConfirmacaoExclusao = (candidato: Candidato) => {
     setCandidatoParaExcluir(candidato);
     setModalVisibleConfirm(true);
+  };
+
+    const toggleAnonima = async () => {
+    setAnonima((prev) => {
+      AsyncStorage.setItem("campanhaAnonima", (!prev).toString());
+      return !prev;
+    });
   };
 
   const excluirCandidato = async () => {
@@ -105,6 +118,18 @@ export default function Campanha() {
           }}
         />
       )}
+
+      <View style={styles.switchRow}>
+        <Text style={styles.switchLabel}>
+          {anonima ? "Campanha Anónima" : "Campanha Pública"}
+        </Text>
+        <Switch
+          value={!anonima}
+          onValueChange={toggleAnonima}
+          thumbColor={anonima ? "#888" : "#4B2AFA"}
+          trackColor={{ false: "#ccc", true: "#7d6ce0" }}
+        />
+      </View>
 
       <View style={styles.candidatosBox}>
         <View style={styles.headerRow}>
@@ -266,6 +291,20 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 20,
     flex: 1,
+  },
+    switchRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 15,
+    backgroundColor: "#f5f5f5",
+    padding: 10,
+    borderRadius: 10,
+  },
+  switchLabel: {
+    fontWeight: "bold",
+    fontSize: 15,
+    color: "#111",
   },
   headerRow: {
     flexDirection: "row",

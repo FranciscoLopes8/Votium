@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const IP = "172.20.10.4";
+const IP = "192.168.1.80";
 
 // ABI simples do contrato
 export const VOTO_ABI = [
@@ -10,9 +10,9 @@ export const VOTO_ABI = [
     "function jaVotou(address) public view returns (bool)"
 ];
 
-export const VOTO_ADDRESS = "0x9b278F5054DcbCf38c73C203548c0738DB6e4777";
+export const VOTO_ADDRESS = "0x848E0FF5f4B4C3E3Ce1C01d85D375b454C8F5044";
 
-export const GANACHE_URL = "HTTP://172.20.10.4:7545";
+export const GANACHE_URL = "HTTP://192.168.1.80:7545";
 
 const fetchUserPrivateKey = async () => {
     try {
