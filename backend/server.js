@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
-const upload = require("./middleware/upload"); // importação do multer
+const upload = require("./middleware/upload"); 
 
 const seedAdmin = require("./seedAdmin");
 const seedCandidates = require('./seedCandidates');

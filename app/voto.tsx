@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, ActivityIndicator, Image } from "react-native";
-import { getVotoContract, obterVotosPorCandidato, obterTotalVotos } from "./contracts/votoContractV2";
+import { getVotoContract, obterVotosPorCandidato, obterTotalVotos } from "../contracts/votoContractV2";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { IP } from "../config";
+import * as SecureStore from 'expo-secure-store';
 
 export default function Voto() {
   const [codigoPessoal, setCodigoPessoal] = useState("");
@@ -39,7 +40,7 @@ export default function Voto() {
 
   const fetchUser = async () => {
     try {
-      const token = await AsyncStorage.getItem("token");
+      const token = await SecureStore.getItemAsync("token");
 
       const response = await fetch(`http://${IP}:5000/auth/perfil`, {
         method: "GET",

@@ -7,8 +7,8 @@ import {
   StyleSheet,
 } from "react-native";
 import { router } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
+import * as SecureStore from 'expo-secure-store';
 
 import { IP } from "../config";
 
@@ -66,7 +66,7 @@ export default function CriarConta() {
       const data = await response.json();
 
       if (response.ok) {
-        await AsyncStorage.setItem("token", data.token);
+        await SecureStore.setItemAsync("token", data.token);
         router.push("/verification");
       } else {
         alert(data.message);

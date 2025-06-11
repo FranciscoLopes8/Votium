@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Clipboard from 'expo-clipboard';
+import * as SecureStore from 'expo-secure-store';
 
 import { IP } from "../config";
 
@@ -16,7 +17,7 @@ export default function Profile() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = await AsyncStorage.getItem("token");
+        const token = await SecureStore.getItemAsync("token");
         if (!token) {
           router.push("./authLogin");
           return;
@@ -85,7 +86,7 @@ export default function Profile() {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.option} onPress={async () => {
-          await AsyncStorage.removeItem("token");
+          await SecureStore.deleteItemAsync("token");
           router.push("./login");
         }}>
           <Ionicons name="log-out" size={24} color="red" />

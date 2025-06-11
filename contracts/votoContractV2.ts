@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
 
-import { IP } from "../../config";
+import { IP } from "../config";
 
 // ABI do contrato
 export const VOTO_ABI = [
@@ -12,13 +12,13 @@ export const VOTO_ABI = [
     "function jaVotou(address) public view returns (bool)",
 ];
 
-export const VOTO_ADDRESS = "0x899C18b187E2EE674039462720B3780A2DbA1314";
+export const VOTO_ADDRESS = "0x4583736cb719188745B070663567dF87B674cf65";
 
 export const GANACHE_URL = `HTTP://${IP}:7545`;
 
 const fetchUserPrivateKey = async () => {
     try {
-        const token = await AsyncStorage.getItem("token");
+        const token = await SecureStore.getItemAsync("token");
 
         if (!token) {
             throw new Error("Token não encontrado.");

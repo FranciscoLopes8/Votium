@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import * as SecureStore from 'expo-secure-store';
 
 import { IP } from "../config";
 
@@ -28,7 +28,9 @@ export default function Index() {
       const data = await response.json();
 
       if (response.ok) {
-        await AsyncStorage.setItem("token", data.token);
+        await SecureStore.setItemAsync("token", data.token);
+        const storedToken = await SecureStore.getItemAsync("token");
+        console.log("Token armazenado:", storedToken);
         router.push("/home");
       } else {
         alert(data.message || "Credenciais Erradas");

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, ActivityIndicator } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getVotoContract } from "./contracts/votoContractV2";
+import * as SecureStore from 'expo-secure-store';
+import { getVotoContract } from "../contracts/votoContractV2";
 import { Ionicons } from '@expo/vector-icons';
 import { IP } from "../config";
 
@@ -71,9 +71,9 @@ export default function CandidateDetails() {
 
     const fetchUser = async () => {
       try {
-        const token = await AsyncStorage.getItem("token");
+        const token = await SecureStore.getItemAsync("token");
         if (!token) {
-          router.push("./authLogin");
+          router.push("./login");
           return;
         }
 

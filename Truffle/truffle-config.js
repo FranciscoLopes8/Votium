@@ -1,14 +1,14 @@
 module.exports = {
   networks: {
     development: {
-      host: "192.168.1.170",
+      host: "192.168.1.183",
       port: 7545,
-      network_id: "*" // Match any network id
+      network_id: "*"
     }
   },
-  compilers: { // Adiciona esta secção
+  compilers: {
     solc: {
-      version: "0.8.13", // Usa uma versão mais recente do Solidity
+      version: "0.8.13",
       settings: {
         optimizer: {
           enabled: true,

@@ -2,23 +2,28 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { Wallet, ethers } = require("ethers");
+const crypto = require("crypto");
 
 const User = require("../models/User");
 const router = express.Router();
 
-const GANACHE_URL = "HTTP://192.168.1.170:7545";
+const GANACHE_URL = "HTTP://192.168.1.183:7545";
 const provider = new ethers.providers.JsonRpcProvider(GANACHE_URL);
 
 const generateSecureCode = (length = 8) => {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+
+    const randomBytes = crypto.randomBytes(length);
     let result = '';
+
     for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
+        const randomIndex = randomBytes[i] % charactersLength;
         result += characters[randomIndex];
     }
+
     return result;
 };
-
 const transferirETH = async (paraEndereco) => {
     const admin = await User.findOne({ role: "Admin" });
     if (!admin || !admin.walletPrivateKey) {
@@ -69,11 +74,17 @@ router.post("/register", async (req, res) => {
                 id: novoUsuario._id,
                 telefone: novoUsuario.telefone,
                 role: novoUsuario.role,
-                codigoPessoal: novoUsuario.codigoPessoal
             },
             process.env.JWT_SECRET,
             { expiresIn: "2h" }
         );
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 2 * 60 * 60 * 1000
+        });
 
         res.status(201).json({
             token,

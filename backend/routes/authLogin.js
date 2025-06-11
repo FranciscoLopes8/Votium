@@ -1,12 +1,23 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const rateLimit = require("express-rate-limit");
 const User = require("../models/User");
 
 const router = express.Router();
 
-router.post("/login", async (req, res) => {
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: { message: "Muitas tentativas de login. Tente novamente mais tarde." },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+router.post("/login", loginLimiter, async (req, res) => {
     const { telefone, password } = req.body;
+    const ip = req.ip;
+    const timestamp = new Date().toISOString();
 
     try {
         const user = await User.findOne({ telefone });
@@ -18,6 +29,8 @@ router.post("/login", async (req, res) => {
         if (!isMatch) {
             return res.status(400).json({ message: "Palavra-passe incorreta!" });
         }
+
+        console.log(`[${timestamp}] Login bem sucedido - Telefone: ${telefone} - IP: ${ip}`);
 
         const token = jwt.sign(
             { id: user._id, telefone: user.telefone, role: user.role, codigoPessoal: user.codigoPessoal },
@@ -37,7 +50,7 @@ router.post("/login", async (req, res) => {
             },
         });
     } catch (error) {
-        console.log(error);
+        console.error(`[${timestamp}] Erro no servidor login - Telefone: ${telefone} - IP: ${ip} - Erro: ${error.message}`);
         res.status(500).json({ message: "Erro no servidor", error: error.message });
     }
 });

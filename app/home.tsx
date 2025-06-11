@@ -4,6 +4,8 @@ import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FlashList } from "@shopify/flash-list";
 import { Ionicons } from '@expo/vector-icons';
+import * as SecureStore from 'expo-secure-store';
+
 
 import { IP } from "../config";
 
@@ -27,9 +29,9 @@ export default function Home() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = await AsyncStorage.getItem("token");
+        const token = await SecureStore.getItemAsync("token");
         if (!token) {
-          router.push("./authLogin");
+          router.push("./login");
           return;
         }
 
@@ -72,9 +74,12 @@ export default function Home() {
           const dataVotacao = new Date(dataStr);
           await AsyncStorage.setItem("votacaoTerminada", "false");
           iniciarContagemRegressiva(dataVotacao);
+        } else {
+          setLoadingData(false);
         }
       } catch (error) {
         console.error("Erro ao buscar data de votação:", error);
+        setLoadingData(false);
       }
     };
 
@@ -84,7 +89,7 @@ export default function Home() {
   }, []);
 
   const iniciarContagemRegressiva = (dataAlvo: Date) => {
-    const intervalo = setInterval(async () => {
+    const atualizarTempo = async () => {
       const agora = new Date().getTime();
       const alvo = dataAlvo.getTime();
       const restante = alvo - agora;
@@ -92,9 +97,8 @@ export default function Home() {
       if (restante <= 0) {
         clearInterval(intervalo);
         setTempoRestante({ dias: 0, horas: 0, minutos: 0, segundos: 0 });
-
         await AsyncStorage.setItem("votacaoTerminada", "true");
-
+        setLoadingData(false);
         return;
       }
 
@@ -104,9 +108,13 @@ export default function Home() {
       const segundos = Math.floor((restante % (1000 * 60)) / 1000);
 
       setTempoRestante({ dias, horas, minutos, segundos });
-      setLoadingData(false);
-    }, 1000);
+      setLoadingData(false); 
+    };
+
+    atualizarTempo(); 
+    const intervalo = setInterval(atualizarTempo, 1000);
   };
+
 
   if (loadingUser || loadingCandidatos || loadingData) {
     return (
