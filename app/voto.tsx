@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import {
   View,
@@ -45,6 +43,7 @@ export default function Voto() {
   const [paginaAtual, setPaginaAtual] = useState(0)
   const [totalPaginas, setTotalPaginas] = useState(0)
   const ITENS_POR_PAGINA = 20
+  const [todosUsers, setTodosUsers] = useState<any[]>([])
 
   useEffect(() => {
     const init = async () => {
@@ -52,6 +51,7 @@ export default function Voto() {
       try {
         await fetchUser()
         await verificarCampanhaPublica()
+        await fetchAllUsers()
       } catch (err) {
         console.error("Erro a buscar perfil:", err)
       } finally {
@@ -95,6 +95,29 @@ export default function Voto() {
       }
     } catch (error) {
       console.error("Erro ao buscar perfil:", error)
+    }
+  }
+
+  const fetchAllUsers = async () => {
+    try {
+      const token = await SecureStore.getItemAsync("token")
+
+      const response = await fetch(`http://${IP}:5000/users`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
+
+      const data = await response.json();
+      if (response.ok) {
+        setTodosUsers(data)
+      } else {
+        alert("Erro ao carregar users")
+      }
+    } catch (error) {
+      console.error("Erro ao carregar users:", error)
     }
   }
 
@@ -234,7 +257,6 @@ export default function Voto() {
     setVotosDetalhados([])
 
     try {
-      // Usar as novas funções do contrato
       const numeroCodigos = await obterNumeroCodigosPorCandidato(partido.id)
       const totalPaginas = Math.ceil(Number(numeroCodigos) / ITENS_POR_PAGINA)
       setTotalPaginas(totalPaginas)
@@ -265,6 +287,12 @@ export default function Voto() {
       setCarregandoDetalhes(false)
     }
   }
+
+  const codigoParaNome: Record<string, string> = {}
+  todosUsers.forEach((user) => {
+    const nomeCompleto = `${user.primeiroNome} ${user.ultimoNome || ""}`.trim()
+    codigoParaNome[user.codigoPessoal] = nomeCompleto
+  })
 
   const irParaPaginaAnterior = () => {
     if (paginaAtual > 0) {
@@ -470,7 +498,9 @@ export default function Voto() {
                 {votosDetalhados.length > 0 ? (
                   votosDetalhados.map((codigo, index) => (
                     <View key={index} style={styles.codigoItem}>
-                      <Text style={styles.codigoText}>{codigo}</Text>
+                      <Text style={styles.codigoText}>
+                        {codigoParaNome[codigo] ? `${codigoParaNome[codigo]} (${codigo})` : codigo}
+                      </Text>
                     </View>
                   ))
                 ) : (
