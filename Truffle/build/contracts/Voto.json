@@ -43,7 +43,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -72,7 +73,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -109,7 +111,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.8.13+commit.abaa5c0e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"votante\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"candidatoId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"codigoPessoal\",\"type\":\"string\"}],\"name\":\"VotoRegistado\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_codigoPessoal\",\"type\":\"string\"}],\"name\":\"consultarVoto\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"candidatoId\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"jaVotou\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_candidatoId\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"_codigoPessoal\",\"type\":\"string\"}],\"name\":\"votar\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"votos\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"candidatoId\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"codigoPessoal\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"votante\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Voto.sol\":\"Voto\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/Voto.sol\":{\"keccak256\":\"0x650be540e8a12c47992afe637400045caeb218e411369d04724749247229ccc8\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://1197c98d7a16c4ed5794dbc69cab5669e42e1c9ef7fc352b7fd8e9295b9342ec\",\"dweb:/ipfs/QmPPkbhxrGBV1gvG1KQZ3oohijcVth6WCQwpf64SyFfk13\"]}},\"version\":1}",
@@ -5865,8 +5868,8 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0x4De48b354aAe2487ab0AfE0F988AB91c6015d0a1",
-      "transactionHash": "0xc9332affe2afdd1d41bd4fa3343ed6b2deb3beb6f35433c4d075a2396abb9a43"
+      "address": "0xCdD7407ae43Bf38912E961Bef8FF7D64367eb8F6",
+      "transactionHash": "0x166a6a61ad63758d6ab1a08072a221b929d32368f0ded5ff47d733dab4739194"
     },
     "1748595967324": {
       "events": {},
@@ -5888,7 +5891,8 @@
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2025-06-11T14:43:42.537Z",
+  "updatedAt": "2025-06-12T11:32:49.190Z",
+  "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
     "methods": {},

@@ -16,7 +16,7 @@ export const VOTO_ABI = [
   "function obterCodigosPorCandidato(uint, uint, uint) public view returns (string[] memory)",
 ]
 
-export const VOTO_ADDRESS = "0x848E0FF5f4B4C3E3Ce1C01d85D375b454C8F5044"
+export const VOTO_ADDRESS = "0x1e94123cCcc01F22b918CfAe4c27D56ae39DBA6a"
 
 export const GANACHE_URL = `HTTP://${IP}:7545`
 
