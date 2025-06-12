@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
-const upload = require("./middleware/upload"); 
+const upload = require("./middleware/upload");
 
 const seedAdmin = require("./seedAdmin");
 const seedCandidates = require('./seedCandidates');
@@ -34,6 +34,7 @@ app.use("/auth", require("./routes/authRegister.js"));
 app.use("/auth", require("./routes/authLogin.js"));
 app.use("/auth", require("./routes/authPerfil.js"));
 app.use("/candidates", require("./routes/candidates.js"));
+app.use("/users", require("./routes/users.js"));
 app.use('/uploads', express.static('uploads'));
 app.use("/perfil", require("./routes/editProfile.js"));
 app.use("/candidatoperfil", require("./routes/editCandidate.js"));

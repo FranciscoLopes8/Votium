@@ -30,7 +30,6 @@ export default function Index() {
       if (response.ok) {
         await SecureStore.setItemAsync("token", data.token);
         const storedToken = await SecureStore.getItemAsync("token");
-        console.log("Token armazenado:", storedToken);
         router.push("/home");
       } else {
         alert(data.message || "Credenciais Erradas");
