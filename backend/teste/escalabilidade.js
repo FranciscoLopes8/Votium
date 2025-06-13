@@ -1,4 +1,4 @@
-/*
+
 
 const { ethers } = require("ethers");
 const dotenv = require("dotenv");
@@ -105,9 +105,9 @@ const testeDeEscalabilidade = async (quantidade) => {
     await testeDeEscalabilidade(10000); // numero de votos
 })();
 
-*/
 
 
+/* 
 const { ethers } = require("ethers");
 const dotenv = require("dotenv");
 
@@ -220,4 +220,4 @@ const testeDeEscalabilidade = async (quantidade) => {
     await testeDeEscalabilidade(100); // numero de eleitores
 })();
 
-
+*/

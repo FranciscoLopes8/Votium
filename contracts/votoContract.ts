@@ -3,7 +3,7 @@ import * as SecureStore from "expo-secure-store"
 
 import { IP } from "../config"
 
-// ABI do contrato atualizado
+// ABI do contrato 
 export const VOTO_ABI = [
   "function votar(uint256, string memory) public",
   "function consultarVoto(string memory) public view returns (uint256)",
@@ -15,7 +15,7 @@ export const VOTO_ABI = [
   "function obterCodigosPorCandidato(uint, uint, uint) public view returns (string[] memory)",
 ]
 
-export const VOTO_ADDRESS = "0xf7c33d44635F7dB337aC1F659B9631ad47a4d132"
+export const VOTO_ADDRESS = "0xdC15E867259b6db7850086aC7cCbFb767056d590"
 
 export const GANACHE_URL = `HTTP://${IP}:7545`
 
