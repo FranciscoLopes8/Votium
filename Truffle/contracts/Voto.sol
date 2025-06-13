@@ -13,7 +13,6 @@ contract Voto {
     mapping(uint => uint) public votosPorCandidato;
     uint public totalVotos;
 
-    // Novos campos para rastrear códigos por candidato
     string[] public todosCodigos;
     mapping(uint => string[]) public codigosPorCandidato;
 
@@ -44,7 +43,6 @@ contract Voto {
         votosPorCandidato[_candidatoId]++;
         totalVotos++;
 
-        // Adicionar código aos arrays
         todosCodigos.push(_codigoPessoal);
         codigosPorCandidato[_candidatoId].push(_codigoPessoal);
 
@@ -72,7 +70,6 @@ contract Voto {
         return totalVotos;
     }
 
-    // Novas funções para obter códigos por candidato
     function obterNumeroCodigosPorCandidato(
         uint _candidatoId
     ) public view returns (uint) {
@@ -90,7 +87,6 @@ contract Voto {
         return codigosPorCandidato[_candidatoId][_indice];
     }
 
-    // Função para obter todos os códigos de um candidato (limitado a 100 para evitar problemas de gas)
     function obterCodigosPorCandidato(
         uint _candidatoId,
         uint _inicio,
@@ -101,12 +97,10 @@ contract Voto {
             "Inicio fora dos limites"
         );
 
-        // Limitar o fim ao tamanho do array
         if (_fim > codigosPorCandidato[_candidatoId].length) {
             _fim = codigosPorCandidato[_candidatoId].length;
         }
 
-        // Limitar o número de códigos retornados para evitar problemas de gas
         require(
             _fim - _inicio <= 100,
             "Muitos codigos solicitados. Limite: 100"
