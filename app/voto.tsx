@@ -16,7 +16,7 @@ import {
   obterTotalVotos,
   obterNumeroCodigosPorCandidato,
   obterCodigosPorCandidato,
-} from "../contracts/votoContractV2"
+} from "../contracts/votoContract"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { IP } from "../config"
 import * as SecureStore from "expo-secure-store"
@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   header: {
-    backgroundColor: "#3C1FA1",
+    backgroundColor: "#4B2AFA",
     padding: 20,
     borderRadius: 15,
     marginBottom: 20,
@@ -693,7 +693,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     width: "90%",
     maxHeight: "80%",
-    padding: 0,
+    padding: 10,
   },
   modalHeader: {
     flexDirection: "row",

@@ -17,7 +17,7 @@ const seedAdmin = async () => {
             role: "Admin",
             codigoPessoal: "00000000",
             imagem: "",
-            walletPrivateKey: "0xbde69bc5ae597c87f6b077ba8106def0c10a6ffe2ab69f80d5bbf6b00c7a9573"
+            walletPrivateKey: "0x468f607bf4704dcb7cbb167288b26d65862d371a18d6925de7beee296783fbec"
         });
 
         await adminUser.save();

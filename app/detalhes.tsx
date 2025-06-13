@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, ActivityIndicator } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import * as SecureStore from 'expo-secure-store';
-import { getVotoContract } from "../contracts/votoContractV2";
+import { getVotoContract } from "../contracts/votoContract";
 import { Ionicons } from '@expo/vector-icons';
 import { IP } from "../config";
 
@@ -126,19 +126,19 @@ export default function CandidateDetails() {
       <Text style={styles.party}>{candidato.partido}</Text>
 
       <TouchableOpacity style={styles.voteButton} onPress={() => setModalVisible(true)}>
-        <Text style={styles.voteText}>Vote now</Text>
+        <Text style={styles.voteText}>Vote Agora</Text>
       </TouchableOpacity>
 
       {/* Tabs Section */}
       <View style={styles.tabs}>
         <TouchableOpacity onPress={() => setActiveTab('Profile')}>
           <Text style={activeTab === 'Profile' ? styles.activeTab : styles.inactiveTab}>
-            Profile
+            Perfil
           </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setActiveTab('Campaign')} style={{ marginLeft: 20 }}>
           <Text style={activeTab === 'Campaign' ? styles.activeTab : styles.inactiveTab}>
-            Campaign
+            Campanha
           </Text>
         </TouchableOpacity>
       </View>

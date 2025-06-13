@@ -13,7 +13,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Criar pasta 'uploads' se não existir
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
@@ -54,4 +53,4 @@ app.post('/upload', upload.single('imagem'), (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+app.listen(PORT, () => console.log(`Servidor a correr na porta ${PORT}`));

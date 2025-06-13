@@ -15,14 +15,17 @@ export default function RootLayout() {
     if (pathname.startsWith("/perfil") || pathname.startsWith("/editar") || pathname.startsWith("/about")) return "profile";
     if (pathname.startsWith("/voto")) return "vote";
     if (pathname.startsWith("/home")) return "home";
+    if (pathname.startsWith("/editarCandidato")) return "home";
     return "home";
   });
 
 
   useEffect(() => {
-    if (pathname.startsWith("/perfil") || pathname.startsWith("/editar") || pathname.startsWith("/about")) setSelectedTab("profile");
+    if (pathname.startsWith("/editarCandidato")) setSelectedTab("home");
+    else if (pathname.startsWith("/perfil") || pathname.startsWith("/editar") || pathname.startsWith("/about")) setSelectedTab("profile");
     else if (pathname.startsWith("/voto")) setSelectedTab("vote");
     else if (pathname.startsWith("/home")) setSelectedTab("home");
+
     else setSelectedTab("home"); // fallback
   }, [pathname]);
 

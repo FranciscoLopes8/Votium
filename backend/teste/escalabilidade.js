@@ -122,8 +122,8 @@ const VOTO_ABI = [
     "function jaVotou(address) public view returns (bool)",
 ];
 
-const VOTO_ADDRESS = "0xdC251221339959b378Ad5c8Ac6f8bBE1CA7a7708";
-const GANACHE_URL = "http://127.0.0.1:8545";
+const VOTO_ADDRESS = "0x4B225ABDbE6E38801e190F93ce89C6b122Fd1FF7";
+const GANACHE_URL = "http://192.168.1.183:7545";
 
 
 const transferirETH = async (adminWallet, paraEndereco) => {
@@ -187,8 +187,16 @@ const testeDeEscalabilidade = async (quantidade) => {
 
     await Promise.all(
         carteiras.map(async (wallet, index) => {
-            const candidatoId = index % 3;
-            const codigo = `codigo-${index}`;
+            const rand = Math.random();
+
+            let candidatoId;
+            if (rand < 0.7) {
+                candidatoId = Math.floor(Math.random() * 3); 
+            } else {
+                candidatoId = 3 + Math.floor(Math.random() * 4); 
+            }
+
+            const codigo = `codigo-${index}2`;
             const resultado = await simularVoto(wallet, candidatoId, codigo);
             if (resultado.sucesso) sucesso++;
             else falhas++;
@@ -209,7 +217,7 @@ const testeDeEscalabilidade = async (quantidade) => {
 
 
 (async () => {
-    await testeDeEscalabilidade(10000); // numero de eleitores
+    await testeDeEscalabilidade(100); // numero de eleitores
 })();
 
 
