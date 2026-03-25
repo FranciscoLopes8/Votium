@@ -40,6 +40,8 @@ build/contracts/
 # Backend uploads
 /backend/uploads/
 
+/backend/.env
+
 # Expo files
 .expo/
 .expo-shared/
