@@ -1,4 +1,4 @@
-# Votium 🗳️
+# Votium 
 
 > A decentralized, blockchain-based e-voting mobile application built with React Native (Expo), Express.js, and Ethereum smart contracts.
 >
